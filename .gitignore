@@ -17,10 +17,12 @@ langchain_logs/
 *.json
 *.txt
 
+
 # Python
 __pycache__/
-*.py[cod]
-*.so
+*.pyc
+*.pyo
+*.pyd
 
 # IDEs
 .vscode/
