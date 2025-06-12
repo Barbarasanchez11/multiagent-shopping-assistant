@@ -1,0 +1,27 @@
+# Python environments
+.env
+.venv/
+venv/
+
+# Env files
+*.env
+*.env.*
+
+# LangGraph
+.langchain/
+.langgraph/
+langchain_logs/
+
+# Output files
+*.pdf
+*.json
+*.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+
+# IDEs
+.vscode/
+.idea/
