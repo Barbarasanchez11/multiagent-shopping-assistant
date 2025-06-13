@@ -3,27 +3,46 @@
 .venv/
 venv/
 
+# Python env + metadata
+*.egg-info/
+.eggs/
+*.log
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
 # Env files
 *.env
 *.env.*
 
-# LangGraph
-.langchain/
+# LangGraph + LangChain caches
 .langgraph/
+.langgraph_api/
+.langchain/
 langchain_logs/
 
 # Output files
 *.pdf
 *.json
 *.txt
+*.csv
 
+# Notebooks
+.ipynb_checkpoints/
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# IDEs
+# IDEs / Editors
 .vscode/
 .idea/
+*.swp
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# LangGraph dev artifacts
+.langgraph_api/
+.langgraph/
+.langchain/
+langchain_logs/

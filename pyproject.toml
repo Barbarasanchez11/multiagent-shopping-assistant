@@ -12,6 +12,9 @@ python = ">=3.10,<3.13"
 langgraph = "*"
 langchain = "*"
 langchain-groq = "*"
+httpx = "*"
+fpdf = "^1.7"
+beautifulsoup4 = "^4.12"
 
 [tool.poetry.group.dev.dependencies]
 langgraph-cli = { extras = ["inmem"], version = "*" }
