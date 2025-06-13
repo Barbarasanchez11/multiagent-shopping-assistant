@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "multiagent-shopping-assistant"
+version = "0.1.0"
+description = "AI assistant that builds shopping lists with LangGraph agents"
+authors = ["Barbarasanchez11 <barbarasanchezurbano@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{ include = "agents" }, { include = "graphs" }]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+langgraph = "*"
+langchain = "*"
+langchain-groq = "*"
+
+[tool.poetry.group.dev.dependencies]
+langgraph-cli = { extras = ["inmem"], version = "*" }
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
