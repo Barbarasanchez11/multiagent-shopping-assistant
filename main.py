@@ -1,16 +1,9 @@
-from schemas import GraphState, DetectedProduct
-from agents.mercadona_search import mercadona_search_agent
+from graphs.shopping_graph import app
+from schemas import GraphState
 
 if __name__ == "__main__":
-    test_state = GraphState(
-        user_input="",
-        detected_products=[
-            DetectedProduct(name="leche", quantity=1),
-            DetectedProduct(name="pan", quantity=2),
-            DetectedProduct(name="huevos", quantity=4)
-        ]
-    )
+    state = GraphState(user_input="")
+    final_state = app.invoke(state)
+    print("Final state:")
+    print(final_state)
 
-    result = mercadona_search_agent(test_state)
-
-    print("Result:", result)
