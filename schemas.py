@@ -16,4 +16,5 @@ class FoundProduct(BaseModel):
 class GraphState(BaseModel):
     user_input: str
     detected_products: Optional[List[DetectedProduct]] = None
-    found_products:List[FoundProduct] = []
+    found_products:List[FoundProduct  ] = []
+

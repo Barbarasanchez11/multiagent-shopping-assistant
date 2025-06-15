@@ -6,21 +6,23 @@ import json
 llm = ChatGroq(model_name="llama3-8b-8192")
 
 prompt = ChatPromptTemplate.from_template("""
-You are a shopping assistant.
 
-Your task is to extract product names and their quantities from the user input.
+Eres un asistente de compras.
 
-Respond ONLY with a JSON array like this:
+Tu tarea es extraer nombres de productos y sus cantidades desde la entrada del usuario.
+
+Responde SOLO con un array JSON como este:
 
 [
-  {{"name": "apples", "quantity": 3}},
-  {{"name": "water", "quantity": 2}}
+  {{"name": "manzanas", "quantity": 3}},
+  {{"name": "agua", "quantity": 2}}
 ]
 
-Do not include any extra text or explanations.
+No incluyas texto adicional ni explicaciones.
 
-User input: {user_input}
+Entrada del usuario: {user_input}
 """)
+
 
 chain = prompt | llm
 
