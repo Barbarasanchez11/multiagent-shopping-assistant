@@ -6,19 +6,21 @@ import json
 llm = ChatGroq(model_name="llama3-8b-8192")
 
 prompt = ChatPromptTemplate.from_template("""
-
 Eres un asistente de compras.
 
-Tu tarea es extraer nombres de productos y sus cantidades desde la entrada del usuario.
+Tu tarea es extraer todos los productos mencionados por el usuario y sus cantidades. Siempre debes devolver al menos un producto si hay alguno reconocible.
 
-Responde SOLO con un array JSON como este:
+- Acepta productos aunque no tengan unidad clara.
+- Si hay confusión, asume que se trata de una unidad por defecto (1).
+- Siempre responde SOLO en formato JSON con una lista de objetos como:
 
 [
   {{"name": "manzanas", "quantity": 3}},
-  {{"name": "agua", "quantity": 2}}
+  {{"name": "agua", "quantity": 2}},
+  {{"name": "arroz", "quantity": 1}}
 ]
 
-No incluyas texto adicional ni explicaciones.
+No añadas texto ni explicaciones adicionales.
 
 Entrada del usuario: {user_input}
 """)
