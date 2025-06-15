@@ -29,6 +29,9 @@ langchain_logs/
 *.txt
 *.csv
 
+!config.json
+!langgraph.config.json
+
 # Notebooks
 .ipynb_checkpoints/
 

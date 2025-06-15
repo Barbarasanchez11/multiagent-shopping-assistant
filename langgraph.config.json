@@ -1,0 +1,11 @@
+{
+    "dependencies": [
+      "langgraph",
+      "langchain",
+      "groq"
+    ],
+    "graphs": {
+      "shopping_graph": "graphs.shopping_graph:app"
+    }
+  }
+  
