@@ -29,9 +29,7 @@ Entrada del usuario: {user_input}
 chain = prompt | llm
 
 def parse_output(text: str):
-    print('-'*20)
-    print(text,'output de parser')
-    print('-'*20)
+  
     try:
         data = json.loads(text)
         products = [
@@ -44,14 +42,7 @@ def parse_output(text: str):
         return []
 
 def classify_intent_agent(state: GraphState) -> GraphState:
-    print('-'*20)
-    print("intent classifier")
-    print(state.user_input,'input de classifier')
-    print('-'*20)
     response = chain.invoke({"user_input": state.user_input})
-    print('-'*20)
-    print(response.content,'response classifier')
-    print('-'*20)
     state.detected_products = parse_output(response.content)
    
     return state

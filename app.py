@@ -4,7 +4,7 @@ from utils.exporter import generate_txt, generate_json
 from graphs.shopping_graph import app
 from schemas import GraphState
 
-st.title("🛒 Tu Asistente de Compras")
+st.title("Tu Asistente de Compras")
 
 user_input = st.text_input("Introduce tu lista de la compra (en español)")
 
@@ -22,3 +22,5 @@ if user_input:
 
     json_file = generate_json(ticket).encode("utf-8")
     st.download_button("Descargar JSON", json_file, "lista_compra.json")
+
+    
