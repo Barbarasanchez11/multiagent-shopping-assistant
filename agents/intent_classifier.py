@@ -1,9 +1,13 @@
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from schemas import DetectedProduct, GraphState
+import os
+from dotenv import load_dotenv
 import json
 
-llm = ChatGroq(model_name="llama3-8b-8192")
+load_dotenv()
+
+llm = ChatGroq(model_name="llama3-8b-8192",  api_key=os.getenv("GROQ_API_KEY"))
 
 prompt = ChatPromptTemplate.from_template("""
 Eres un asistente de compras.

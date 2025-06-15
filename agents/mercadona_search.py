@@ -3,7 +3,6 @@ from schemas import GraphState, DetectedProduct
 import json
 
 def mercadona_search_agent(state: GraphState) -> GraphState:
-    print('mercadona_search_agent',state)
     if not state.detected_products:
         return state
     
@@ -37,7 +36,7 @@ def search_products_by_name(products: list):
             for subcategory in category['categories']:
                 if product_name in subcategory['name'].lower():
                     category_id = subcategory['id']
-                    print(f"Subcategoría encontrada: {subcategory['name']} (ID: {category_id})")
+                    
                     break
             if category_id:
                 break

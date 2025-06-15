@@ -16,6 +16,7 @@ httpx = "*"
 fpdf = "^1.7"
 beautifulsoup4 = "^4.12"
 streamlit = "^1.45.1"
+pydantic = "^1.10"
 
 [tool.poetry.group.dev.dependencies]
 langgraph-cli = { extras = ["inmem"], version = "*" }
