@@ -6,15 +6,19 @@ class DetectedProduct(BaseModel):
     quantity: int
 
 class FoundProduct(BaseModel):
-    name:str
+    product_name:str
     price: float
     quantity: int
+   
+
+class TotalPrice(BaseModel):
+    products: List[FoundProduct]
     total_price: float
-    image: Optional[str] = None
 
 
 class GraphState(BaseModel):
     user_input: str
     detected_products: Optional[List[DetectedProduct]] = None
-    found_products:List[FoundProduct  ] = []
+    found_products:List[FoundProduct] = []
+    total_tickect: Optional[TotalPrice] = None
 
