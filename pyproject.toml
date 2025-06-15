@@ -9,14 +9,18 @@ packages = [{ include = "agents" }, { include = "graphs" }]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
-langgraph = "*"
-langchain = "*"
-langchain-groq = "*"
+langgraph = "0.4.8"
+langchain = "0.3.25"
+langchain-groq = "0.3.2"
 httpx = "*"
 fpdf = "^1.7"
 beautifulsoup4 = "^4.12"
 streamlit = "^1.45.1"
-pydantic = "^1.10"
+pydantic = "2.11.7"
+tenacity = "9.1.2"
+langsmith = "0.3.45"
+langchain-core = "0.3.65"
+langgraph-prebuilt = "0.2.2"
 
 [tool.poetry.group.dev.dependencies]
 langgraph-cli = { extras = ["inmem"], version = "*" }
