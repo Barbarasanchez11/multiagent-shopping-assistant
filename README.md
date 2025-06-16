@@ -68,6 +68,10 @@ Para ver la interfaz gráfica de Streamlit, ejecuta:
 poetry run streamlit run app.py
 ```
 
+## Video de Demostración
+
+Puedes ver un video de demostración del proyecto en el siguiente enlace: [Video Demo](https://drive.google.com/file/d/1PUEliao7GZgfDvu9xkDh_rseVvrtWO0e/view)
+
 ---
 
 Este README proporciona las instrucciones necesarias para configurar y ejecutar el proyecto en diferentes entornos. Asegúrate de seguir cada paso cuidadosamente para garantizar una instalación y ejecución correctas.
