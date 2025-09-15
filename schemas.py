@@ -9,6 +9,7 @@ class FoundProduct(BaseModel):
     product_name: str
     price: float
     quantity: int
+    product_id: Optional[str] = None  # ID único para identificar productos en el carrito
 
 class ProductOption(BaseModel):
     """Opción individual de producto encontrada en la API"""

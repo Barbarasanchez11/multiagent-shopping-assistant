@@ -3,6 +3,8 @@ from utils.exporter import generate_txt, generate_json
 from graphs.shopping_graph import app_with_options
 from schemas import GraphState, FoundProduct
 import json
+import functools
+import time
 
 # Configurar página
 st.set_page_config(
@@ -192,11 +194,31 @@ st.markdown('<h1 class="main-title">🛒 Tu Asistente de Compras</h1>', unsafe_a
 if 'cart_products' not in st.session_state:
     st.session_state.cart_products = []
 
+# Inicializar caché de búsquedas
+if 'search_cache' not in st.session_state:
+    st.session_state.search_cache = {}
+
+# Inicializar caché de categorías
+if 'categories_cache' not in st.session_state:
+    st.session_state.categories_cache = None
+
+# El caché funciona internamente sin mostrar botones al usuario
+
 user_input = st.text_input("Introduce tu lista de la compra (en español)")
 
 if user_input and user_input.strip():
-    state = GraphState(user_input=user_input)
-    final_state = app_with_options.invoke(state)
+    # Verificar caché antes de hacer la búsqueda
+    cache_key = user_input.strip().lower()
+    
+    if cache_key in st.session_state.search_cache:
+        # Usar caché silenciosamente
+        final_state = st.session_state.search_cache[cache_key]
+    else:
+        with st.spinner("🔍 Buscando productos..."):
+        state = GraphState(user_input=user_input)
+            final_state = app_with_options.invoke(state)
+            # Guardar en caché
+            st.session_state.search_cache[cache_key] = final_state
     
     if "product_options" in final_state and final_state["product_options"]:
         st.subheader("Opciones Encontradas")
@@ -281,20 +303,20 @@ if user_input and user_input.strip():
                 
                 col1, col2, col3, col4, col5 = st.columns([1, 1, 2, 1, 1])
                 
-                with col1:
+with col1:
                     if st.button("⏮️ Primera", key=f"first_{product_group.original_query}", 
                                disabled=(current_page == 1), use_container_width=True):
                         st.session_state[pagination_key] = 1
-                        st.rerun()
+        st.rerun()
                 
-                with col2:
+with col2:
                     if st.button("⬅️ Anterior", key=f"prev_{product_group.original_query}", 
                                disabled=(current_page == 1), use_container_width=True):
                         if current_page > 1:
                             st.session_state[pagination_key] = current_page - 1
-                            st.rerun()
+        st.rerun()
                 
-                with col3:
+with col3:
                     st.markdown(f'<div class="pagination-info">Página {current_page} de {total_pages}</div>', 
                                unsafe_allow_html=True)
                 
@@ -374,11 +396,11 @@ if user_input and user_input.strip():
                             
                             # Resetear cantidad temporal
                             st.session_state[temp_quantity_key] = 0
-                            st.rerun()
-                    
+        st.rerun()
+
                     with col2:
                         # Mostrar cantidad temporal en el centro
-                        st.markdown(f"""
+    st.markdown(f"""
                         <div style="
                             background: linear-gradient(45deg, #667eea, #764ba2);
                             color: white;
@@ -392,8 +414,8 @@ if user_input and user_input.strip():
                             border: 2px solid rgba(255,255,255,0.2);
                         ">
                             {temp_quantity}
-                        </div>
-                        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
                         
                         # Botones en una fila horizontal usando st.columns en el nivel principal
                         # Necesitamos salir del contexto de col2 para crear nuevas columnas
@@ -411,7 +433,9 @@ if user_input and user_input.strip():
                         if temp_quantity > 1:
                             if st.button("➖", key=f"decrease_{product_id}", help="Disminuir cantidad", use_container_width=True):
                                 st.session_state[temp_quantity_key] -= 1
-                                st.rerun()
+                                # Solo rerun si hay cambio real
+                                if st.session_state[temp_quantity_key] >= 0:
+                                    st.rerun()
                         elif temp_quantity == 1:
                             if st.button("🗑️", key=f"remove_{product_id}", help="Eliminar cantidad", use_container_width=True):
                                 st.session_state[temp_quantity_key] = 0
@@ -421,7 +445,9 @@ if user_input and user_input.strip():
                         # Botón derecho: siempre + para aumentar cantidad temporal
                         if st.button("➕", key=f"increase_{product_id}", help="Aumentar cantidad", use_container_width=True):
                             st.session_state[temp_quantity_key] += 1
-                            st.rerun()
+                            # Solo rerun si hay cambio real
+                            if st.session_state[temp_quantity_key] > 0:
+                                st.rerun()
             
             # Mostrar información de paginación
             st.info(f"Mostrando {len(page_options)} de {len(filtered_options)} opciones filtradas (de {len(product_group.options)} total)")

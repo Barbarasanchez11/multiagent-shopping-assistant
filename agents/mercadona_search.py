@@ -1,6 +1,25 @@
 import httpx    
 from schemas import GraphState, DetectedProduct, ProductOptions, ProductOption
 import json
+import functools
+
+# Caché global para categorías
+_categories_cache = None
+
+@functools.lru_cache(maxsize=1)
+def get_categories():
+    """Obtiene las categorías de Mercadona con caché"""
+    global _categories_cache
+    if _categories_cache is None:
+        base_url = "https://tienda.mercadona.es/api/categories/"
+        try:
+            response = httpx.get(base_url, timeout=10.0)
+            response.raise_for_status()
+            _categories_cache = response.json()
+        except Exception as e:
+            print(f"❌ Error obteniendo categorías: {e}")
+            return None
+    return _categories_cache
 
 def mercadona_search_agent(state: GraphState) -> GraphState:
     if not state.detected_products:
@@ -28,7 +47,7 @@ def search_products_by_name(products: list):
         response = httpx.get(base_url, timeout=10.0)
         response.raise_for_status()
         data = response.json()
-    except Exception as e:
+                except Exception as e:
         print(f"❌ Error obteniendo categorías: {e}")
         return []
 
@@ -86,7 +105,7 @@ def search_products_by_name(products: list):
             best_option = min(product_options, key=lambda x: x['price'])
             found_products.append(best_option)
             print(f"✅ {product_name}: {len(product_options)} opciones encontradas, seleccionada: {best_option['product_name']} - {best_option['price']}€")
-        else:
+                    else:
             print(f"⚠️ No se encontraron productos para: {product_name}")
 
     return found_products
@@ -96,16 +115,12 @@ def search_products_with_options(products: list, max_options: int = None):
     Busca productos en la API de Mercadona y devuelve TODAS las opciones encontradas.
     Busca en todas las categorías para encontrar todos los productos que contengan la palabra.
     """
-    base_url = "https://tienda.mercadona.es/api/categories/"
-    
-    try:
-        response = httpx.get(base_url, timeout=10.0)
-        response.raise_for_status()
-        data = response.json()
-    except Exception as e:
-        print(f"❌ Error obteniendo categorías: {e}")
+    # Usar caché para categorías
+    data = get_categories()
+    if not data:
         return []
 
+    base_url = "https://tienda.mercadona.es/api/categories/"
     all_product_options = []
 
     for product in products:
@@ -146,8 +161,8 @@ def search_products_with_options(products: list, max_options: int = None):
                                         'category': subcategory['name']
                                     })
                             except (KeyError, TypeError) as e:
-                                continue
-
+                    continue
+                
         # Ordenar por precio (más baratos primero)
         product_options.sort(key=lambda x: x['price'])
         
@@ -162,7 +177,7 @@ def search_products_with_options(products: list, max_options: int = None):
                 'options': product_options
             })
             print(f"✅ {product_name}: {len(product_options)} opciones encontradas")
-        else:
+            else:
             print(f"⚠️ No se encontraron productos para: {product_name}")
 
     return all_product_options
