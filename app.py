@@ -316,23 +316,15 @@ if user_input and user_input.strip():
             
             for i, option in enumerate(page_options):
                 with cols[i % 3]:
-                    # Crear tarjeta de producto con HTML personalizado
-                    category_html = f"<small style='color: #6c757d;'>📂 {option.category}</small>" if hasattr(option, 'category') and option.category else ""
-                    
-                    product_html = f"""
+                    # Crear tarjeta de producto simplificada
+                    st.markdown(f"""
                     <div class="product-card">
-                        <div style="margin-bottom: 0.5rem;">
-                            {category_html}
-                        </div>
-                        <h4 style="margin: 0.5rem 0; color: #2c3e50;">{option.product_name}</h4>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin: 0.5rem 0;">
-                            <span style="font-size: 1.2rem; font-weight: bold; color: #28a745;">💰 {option.price}€</span>
-                            <span style="color: #6c757d;">📊 {float(option.price) * option.quantity:.2f}€</span>
+                        <h4 style="margin: 0.5rem 0; color: #2c3e50; font-size: 1.1rem;">{option.product_name}</h4>
+                        <div style="text-align: center; margin: 1rem 0;">
+                            <span style="font-size: 1.5rem; font-weight: bold; color: #28a745;">{option.price}€</span>
                         </div>
                     </div>
-                    """
-                    
-                    st.markdown(product_html, unsafe_allow_html=True)
+                    """, unsafe_allow_html=True)
                     
                     # Usar índice global para el key único
                     global_idx = start_idx + i
