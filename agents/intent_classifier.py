@@ -15,7 +15,9 @@ def get_groq_api_key():
         load_dotenv()
         return os.getenv("GROQ_API_KEY")
 
-llm = ChatGroq(model_name="llama-3.1-8b-instant", api_key=get_groq_api_key())
+def get_llm():
+    """Obtiene el LLM de forma lazy para evitar problemas con st.secrets al importar"""
+    return ChatGroq(model_name="llama-3.1-8b-instant", api_key=get_groq_api_key())
 
 prompt = ChatPromptTemplate.from_template("""
 Eres un asistente de compras.
@@ -38,10 +40,7 @@ Entrada del usuario: {user_input}
 """)
 
 
-chain = prompt | llm
-
 def parse_output(text: str):
-  
     try:
         data = json.loads(text)
         products = [
@@ -54,6 +53,10 @@ def parse_output(text: str):
         return []
 
 def classify_intent_agent(state: GraphState) -> GraphState:
+    # Obtener el LLM de forma lazy
+    llm = get_llm()
+    chain = prompt | llm
+    
     response = chain.invoke({"user_input": state.user_input})
     state.detected_products = parse_output(response.content)
    
