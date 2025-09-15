@@ -91,10 +91,10 @@ def search_products_by_name(products: list):
 
     return found_products
 
-def search_products_with_options(products: list, max_options: int = 5):
+def search_products_with_options(products: list, max_options: int = None):
     """
-    Busca productos en la API de Mercadona y devuelve múltiples opciones por producto.
-    Permite al usuario elegir entre diferentes opciones.
+    Busca productos en la API de Mercadona y devuelve TODAS las opciones encontradas.
+    Busca en todas las categorías para encontrar todos los productos que contengan la palabra.
     """
     base_url = "https://tienda.mercadona.es/api/categories/"
     
@@ -112,51 +112,48 @@ def search_products_with_options(products: list, max_options: int = 5):
         product_name = product['name'].lower()
         quantity = product['quantity']
         product_options = []
-        category_id = None
+        
+        print(f"🔍 Buscando TODOS los productos que contengan '{product_name}'...")
 
-        # Buscar categoría que contenga el producto
+        # Buscar en TODAS las categorías, no solo en una específica
         for category in data['results']:
             for subcategory in category['categories']:
-                if product_name in subcategory['name'].lower():
-                    category_id = subcategory['id']
-                    break
-            if category_id:
-                break
+                category_id = subcategory['id']
+                detail_url = f"{base_url}{category_id}"
 
-        if not category_id:
-            print(f"⚠️ No se encontró categoría para: {product_name}")
-            continue
+                try:
+                    response_category = httpx.get(detail_url, timeout=10.0)
+                    response_category.raise_for_status()
+                    data_category = response_category.json()
+                except Exception as e:
+                    continue  # Si falla una categoría, continuar con la siguiente
 
-        detail_url = f"{base_url}{category_id}"
+                # Buscar TODAS las opciones que coincidan en esta categoría
+                for inner_cat in data_category['categories']:
+                    for product_category in inner_cat['products']:
+                        if product_name.lower() in product_category['display_name'].lower():
+                            try:
+                                price = product_category['price_instructions']['unit_price']
+                                display_name = product_category['display_name']
+                                
+                                # Evitar duplicados
+                                if not any(opt['product_name'] == display_name for opt in product_options):
+                                    product_options.append({
+                                        'product_name': display_name,
+                                        'price': price,
+                                        'quantity': quantity,
+                                        'original_query': product_name,
+                                        'category': subcategory['name']
+                                    })
+                            except (KeyError, TypeError) as e:
+                                continue
 
-        try:
-            response_category = httpx.get(detail_url, timeout=10.0)
-            response_category.raise_for_status()
-            data_category = response_category.json()
-        except Exception as e:
-            print(f"❌ Error obteniendo categoría {category_id}: {e}")
-            continue
-
-        # Buscar TODAS las opciones que coincidan
-        for inner_cat in data_category['categories']:
-            for product_category in inner_cat['products']:
-                if product_name.lower() in product_category['display_name'].lower():
-                    try:
-                        price = product_category['price_instructions']['unit_price']
-                        display_name = product_category['display_name']
-                        
-                        product_options.append({
-                            'product_name': display_name,
-                            'price': price,
-                            'quantity': quantity,
-                            'original_query': product_name
-                        })
-                    except (KeyError, TypeError) as e:
-                        continue
-
-        # Ordenar por precio y limitar opciones
+        # Ordenar por precio (más baratos primero)
         product_options.sort(key=lambda x: x['price'])
-        product_options = product_options[:max_options]
+        
+        # Aplicar límite solo si se especifica
+        if max_options and len(product_options) > max_options:
+            product_options = product_options[:max_options]
         
         if product_options:
             all_product_options.append({
@@ -183,8 +180,8 @@ def mercadona_search_with_options_agent(state: GraphState) -> GraphState:
         product_dict = item.dict()
         products.append(product_dict)
 
-    # Buscar opciones múltiples
-    product_options_data = search_products_with_options(products, max_options=5)
+    # Buscar TODAS las opciones (sin límite)
+    product_options_data = search_products_with_options(products, max_options=None)
     
     # Convertir a objetos ProductOptions
     product_options = []
