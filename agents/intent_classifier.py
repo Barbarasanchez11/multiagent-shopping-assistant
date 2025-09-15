@@ -1,23 +1,21 @@
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from schemas import DetectedProduct, GraphState
-import streamlit as st
+import os
 import json
 
-# Usar st.secrets para obtener la API key
-def get_groq_api_key():
-    try:
-        return st.secrets["GROQ_API_KEY"]
-    except KeyError:
-        # Fallback para desarrollo local
-        import os
-        from dotenv import load_dotenv
-        load_dotenv()
-        return os.getenv("GROQ_API_KEY")
-
 def get_llm():
-    """Obtiene el LLM de forma lazy para evitar problemas con st.secrets al importar"""
-    return ChatGroq(model_name="llama-3.1-8b-instant", api_key=get_groq_api_key())
+    """Obtiene el LLM con la API key correcta"""
+    # Obtener API key de variables de entorno
+    api_key = os.getenv("GROQ_API_KEY")
+    
+    if not api_key:
+        raise ValueError("GROQ_API_KEY no está configurada. Por favor, configura la variable de entorno.")
+    
+    return ChatGroq(
+        model_name="llama-3.1-8b-instant",
+        api_key=api_key
+    )
 
 prompt = ChatPromptTemplate.from_template("""
 Eres un asistente de compras.
