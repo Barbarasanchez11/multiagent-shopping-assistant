@@ -17,6 +17,9 @@ __pycache__/
 *.env
 *.env.*
 
+# Streamlit secrets (local development)
+.streamlit/secrets.toml
+
 # LangGraph + LangChain caches
 .langgraph/
 .langgraph_api/
