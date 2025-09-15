@@ -24,6 +24,11 @@ if user_input and user_input.strip():
         for product_group in final_state["product_options"]:
             st.write(f"**{product_group.original_query.upper()}** (cantidad: {product_group.quantity}) - {len(product_group.options)} opciones encontradas")
             
+            # Inicializar paginación en session state
+            pagination_key = f"page_{product_group.original_query}"
+            if pagination_key not in st.session_state:
+                st.session_state[pagination_key] = 1
+            
             # Añadir filtros y ordenación
             col1, col2, col3 = st.columns(3)
             
@@ -35,12 +40,11 @@ if user_input and user_input.strip():
                 )
             
             with col2:
-                show_count = st.slider(
-                    "Mostrar opciones:",
-                    min_value=5,
-                    max_value=min(len(product_group.options), 50),
-                    value=min(20, len(product_group.options)),
-                    key=f"count_{product_group.original_query}"
+                items_per_page = st.selectbox(
+                    "Productos por página:",
+                    [12, 24, 36, 48, 60],
+                    index=1,  # Por defecto 24
+                    key=f"per_page_{product_group.original_query}"
                 )
             
             with col3:
@@ -67,13 +71,56 @@ if user_input and user_input.strip():
             elif sort_by == "Nombre Z-A":
                 filtered_options.sort(key=lambda x: x.product_name, reverse=True)
             
-            # Limitar cantidad mostrada
-            filtered_options = filtered_options[:show_count]
+            # Calcular paginación
+            total_pages = (len(filtered_options) + items_per_page - 1) // items_per_page
+            current_page = st.session_state[pagination_key]
             
-            # Mostrar opciones en columnas
+            # Asegurar que la página actual sea válida
+            if current_page > total_pages:
+                st.session_state[pagination_key] = 1
+                current_page = 1
+            elif current_page < 1:
+                st.session_state[pagination_key] = 1
+                current_page = 1
+            
+            # Calcular índices de inicio y fin
+            start_idx = (current_page - 1) * items_per_page
+            end_idx = start_idx + items_per_page
+            page_options = filtered_options[start_idx:end_idx]
+            
+            # Mostrar controles de paginación
+            if total_pages > 1:
+                col1, col2, col3, col4, col5 = st.columns([1, 1, 2, 1, 1])
+                
+                with col1:
+                    if st.button("⏮️ Primera", key=f"first_{product_group.original_query}"):
+                        st.session_state[pagination_key] = 1
+                        st.rerun()
+                
+                with col2:
+                    if st.button("⬅️ Anterior", key=f"prev_{product_group.original_query}"):
+                        if current_page > 1:
+                            st.session_state[pagination_key] = current_page - 1
+                            st.rerun()
+                
+                with col3:
+                    st.write(f"Página {current_page} de {total_pages}")
+                
+                with col4:
+                    if st.button("Siguiente ➡️", key=f"next_{product_group.original_query}"):
+                        if current_page < total_pages:
+                            st.session_state[pagination_key] = current_page + 1
+                            st.rerun()
+                
+                with col5:
+                    if st.button("Última ⏭️", key=f"last_{product_group.original_query}"):
+                        st.session_state[pagination_key] = total_pages
+                        st.rerun()
+            
+            # Mostrar opciones en columnas (3 columnas)
             cols = st.columns(3)
             
-            for i, option in enumerate(filtered_options):
+            for i, option in enumerate(page_options):
                 with cols[i % 3]:
                     with st.container():
                         # Mostrar categoría si está disponible
@@ -84,7 +131,9 @@ if user_input and user_input.strip():
                         st.write(f"💰 {option.price}€")
                         st.write(f"📊 Total: {float(option.price) * option.quantity:.2f}€")
                         
-                        if st.button(f"➕ Elegir", key=f"select_{product_group.original_query}_{i}"):
+                        # Usar índice global para el key único
+                        global_idx = start_idx + i
+                        if st.button(f"➕ Elegir", key=f"select_{product_group.original_query}_{global_idx}"):
                             # Crear producto seleccionado
                             selected_product = FoundProduct(
                                 product_name=option.product_name,
@@ -98,8 +147,7 @@ if user_input and user_input.strip():
                             st.rerun()
             
             # Mostrar información de paginación
-            if len(product_group.options) > show_count:
-                st.info(f"Mostrando {len(filtered_options)} de {len(product_group.options)} opciones. Usa el slider para ver más.")
+            st.info(f"Mostrando {len(page_options)} de {len(filtered_options)} opciones filtradas (de {len(product_group.options)} total)")
             
             st.divider()
     else:
