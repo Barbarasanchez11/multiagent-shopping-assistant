@@ -4,7 +4,189 @@ from graphs.shopping_graph import app_with_options
 from schemas import GraphState, FoundProduct
 import json
 
-st.title("Tu Asistente de Compras")
+# Configurar página
+st.set_page_config(
+    page_title="Asistente de Compras",
+    page_icon="🛒",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# CSS personalizado para mejorar la UI
+st.markdown("""
+<style>
+    /* Resetear estilos de Streamlit para botones */
+    .stButton > button {
+        background: linear-gradient(45deg, #667eea, #764ba2) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 0.6rem 1.2rem !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+        min-width: 120px !important;
+        height: 40px !important;
+        text-align: center !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+        background: linear-gradient(45deg, #5a6fd8, #6a4190) !important;
+    }
+    
+    .stButton > button:disabled {
+        background: #6c757d !important;
+        cursor: not-allowed !important;
+        transform: none !important;
+        opacity: 0.6 !important;
+    }
+    
+    /* Botones de productos específicos */
+    .stButton > button[data-testid*="select_"] {
+        background: linear-gradient(45deg, #28a745, #20c997) !important;
+        min-width: 100px !important;
+        height: 36px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .stButton > button[data-testid*="select_"]:hover {
+        background: linear-gradient(45deg, #218838, #1ea085) !important;
+    }
+    
+    /* Botones de carrito */
+    .stButton > button[data-testid*="remove_"] {
+        background: linear-gradient(45deg, #dc3545, #c82333) !important;
+        min-width: 40px !important;
+        height: 36px !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .stButton > button[data-testid*="remove_"]:hover {
+        background: linear-gradient(45deg, #c82333, #bd2130) !important;
+    }
+    
+    /* Botones de descarga */
+    .stButton > button[data-testid*="Descargar"] {
+        background: linear-gradient(45deg, #fd7e14, #e83e8c) !important;
+        min-width: 140px !important;
+        height: 40px !important;
+    }
+    
+    .stButton > button[data-testid*="Descargar"]:hover {
+        background: linear-gradient(45deg, #e8710a, #d63384) !important;
+    }
+    
+    /* Botón limpiar carrito */
+    .stButton > button[data-testid*="Limpiar"] {
+        background: linear-gradient(45deg, #6c757d, #5a6268) !important;
+        min-width: 140px !important;
+        height: 40px !important;
+    }
+    
+    .stButton > button[data-testid*="Limpiar"]:hover {
+        background: linear-gradient(45deg, #5a6268, #495057) !important;
+    }
+    
+    /* Título principal */
+    .main-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-align: center;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 2rem;
+    }
+    
+    /* Tarjetas de productos */
+    .product-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 1.2rem;
+        margin-bottom: 1rem;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .product-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        border-color: #667eea;
+    }
+    
+    /* Filtros */
+    .filter-section {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    /* Carrito */
+    .cart-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 16px;
+        margin-top: 2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .cart-item {
+        background: rgba(255,255,255,0.15);
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 0.8rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    /* Información de paginación */
+    .pagination-info {
+        background: linear-gradient(45deg, #17a2b8, #6f42c1);
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        text-align: center;
+        font-size: 1rem;
+    }
+    
+    /* Mejorar selectboxes */
+    .stSelectbox > div > div {
+        background: white !important;
+        border: 2px solid #e9ecef !important;
+        border-radius: 8px !important;
+    }
+    
+    .stSelectbox > div > div:hover {
+        border-color: #667eea !important;
+    }
+    
+    /* Mejorar text input */
+    .stTextInput > div > div > input {
+        border: 2px solid #e9ecef !important;
+        border-radius: 8px !important;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: #667eea !important;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25) !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown('<h1 class="main-title">🛒 Tu Asistente de Compras</h1>', unsafe_allow_html=True)
 
 # Inicializar carrito en session state
 if 'cart_products' not in st.session_state:
@@ -29,19 +211,22 @@ if user_input and user_input.strip():
             if pagination_key not in st.session_state:
                 st.session_state[pagination_key] = 1
             
-            # Añadir filtros y ordenación
+            # Añadir filtros y ordenación con diseño mejorado
+            st.markdown('<div class="filter-section">', unsafe_allow_html=True)
+            st.markdown("### 🔍 Filtros y Ordenación")
+            
             col1, col2, col3 = st.columns(3)
             
             with col1:
                 sort_by = st.selectbox(
-                    "Ordenar por:",
+                    "📊 Ordenar por:",
                     ["Precio (menor a mayor)", "Precio (mayor a menor)", "Nombre A-Z", "Nombre Z-A"],
                     key=f"sort_{product_group.original_query}"
                 )
             
             with col2:
                 items_per_page = st.selectbox(
-                    "Productos por página:",
+                    "📄 Productos por página:",
                     [12, 24, 36, 48, 60],
                     index=1,  # Por defecto 24
                     key=f"per_page_{product_group.original_query}"
@@ -49,10 +234,12 @@ if user_input and user_input.strip():
             
             with col3:
                 search_term = st.text_input(
-                    "Filtrar por nombre:",
+                    "🔎 Filtrar por nombre:",
                     key=f"filter_{product_group.original_query}",
                     placeholder="Ej: integral, sin gluten..."
                 )
+            
+            st.markdown('</div>', unsafe_allow_html=True)
             
             # Aplicar filtros y ordenación
             filtered_options = product_group.options
@@ -88,63 +275,80 @@ if user_input and user_input.strip():
             end_idx = start_idx + items_per_page
             page_options = filtered_options[start_idx:end_idx]
             
-            # Mostrar controles de paginación
+            # Mostrar controles de paginación mejorados
             if total_pages > 1:
+                st.markdown("### 📄 Navegación")
+                
                 col1, col2, col3, col4, col5 = st.columns([1, 1, 2, 1, 1])
                 
                 with col1:
-                    if st.button("⏮️ Primera", key=f"first_{product_group.original_query}"):
+                    if st.button("⏮️ Primera", key=f"first_{product_group.original_query}", 
+                               disabled=(current_page == 1), use_container_width=True):
                         st.session_state[pagination_key] = 1
                         st.rerun()
                 
                 with col2:
-                    if st.button("⬅️ Anterior", key=f"prev_{product_group.original_query}"):
+                    if st.button("⬅️ Anterior", key=f"prev_{product_group.original_query}", 
+                               disabled=(current_page == 1), use_container_width=True):
                         if current_page > 1:
                             st.session_state[pagination_key] = current_page - 1
                             st.rerun()
                 
                 with col3:
-                    st.write(f"Página {current_page} de {total_pages}")
+                    st.markdown(f'<div class="pagination-info">Página {current_page} de {total_pages}</div>', 
+                               unsafe_allow_html=True)
                 
                 with col4:
-                    if st.button("Siguiente ➡️", key=f"next_{product_group.original_query}"):
+                    if st.button("Siguiente ➡️", key=f"next_{product_group.original_query}", 
+                               disabled=(current_page == total_pages), use_container_width=True):
                         if current_page < total_pages:
                             st.session_state[pagination_key] = current_page + 1
                             st.rerun()
                 
                 with col5:
-                    if st.button("Última ⏭️", key=f"last_{product_group.original_query}"):
+                    if st.button("Última ⏭️", key=f"last_{product_group.original_query}", 
+                               disabled=(current_page == total_pages), use_container_width=True):
                         st.session_state[pagination_key] = total_pages
                         st.rerun()
             
-            # Mostrar opciones en columnas (3 columnas)
+            # Mostrar opciones en columnas (3 columnas) con diseño mejorado
             cols = st.columns(3)
             
             for i, option in enumerate(page_options):
                 with cols[i % 3]:
-                    with st.container():
-                        # Mostrar categoría si está disponible
-                        if hasattr(option, 'category') and option.category:
-                            st.caption(f"📂 {option.category}")
+                    # Crear tarjeta de producto con HTML personalizado
+                    category_html = f"<small style='color: #6c757d;'>📂 {option.category}</small>" if hasattr(option, 'category') and option.category else ""
+                    
+                    product_html = f"""
+                    <div class="product-card">
+                        <div style="margin-bottom: 0.5rem;">
+                            {category_html}
+                        </div>
+                        <h4 style="margin: 0.5rem 0; color: #2c3e50;">{option.product_name}</h4>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin: 0.5rem 0;">
+                            <span style="font-size: 1.2rem; font-weight: bold; color: #28a745;">💰 {option.price}€</span>
+                            <span style="color: #6c757d;">📊 {float(option.price) * option.quantity:.2f}€</span>
+                        </div>
+                    </div>
+                    """
+                    
+                    st.markdown(product_html, unsafe_allow_html=True)
+                    
+                    # Usar índice global para el key único
+                    global_idx = start_idx + i
+                    if st.button(f"➕ Elegir", key=f"select_{product_group.original_query}_{global_idx}", 
+                               use_container_width=True):
+                        # Crear producto seleccionado
+                        selected_product = FoundProduct(
+                            product_name=option.product_name,
+                            price=float(option.price),
+                            quantity=option.quantity
+                        )
                         
-                        st.write(f"**{option.product_name}**")
-                        st.write(f"💰 {option.price}€")
-                        st.write(f"📊 Total: {float(option.price) * option.quantity:.2f}€")
-                        
-                        # Usar índice global para el key único
-                        global_idx = start_idx + i
-                        if st.button(f"➕ Elegir", key=f"select_{product_group.original_query}_{global_idx}"):
-                            # Crear producto seleccionado
-                            selected_product = FoundProduct(
-                                product_name=option.product_name,
-                                price=float(option.price),
-                                quantity=option.quantity
-                            )
-                            
-                            # Añadir al carrito
-                            st.session_state.cart_products.append(selected_product)
-                            st.success(f"✅ {option.product_name} añadido al carrito!")
-                            st.rerun()
+                        # Añadir al carrito
+                        st.session_state.cart_products.append(selected_product)
+                        st.success(f"✅ {option.product_name} añadido al carrito!")
+                        st.rerun()
             
             # Mostrar información de paginación
             st.info(f"Mostrando {len(page_options)} de {len(filtered_options)} opciones filtradas (de {len(product_group.options)} total)")
@@ -153,53 +357,67 @@ if user_input and user_input.strip():
     else:
         st.warning("No se pudieron encontrar productos para tu lista. Intenta con otros productos.")
 
-# Mostrar carrito
+# Mostrar carrito con diseño mejorado
 if st.session_state.cart_products:
-    st.subheader("Tu Carrito")
+    st.markdown('<div class="cart-section">', unsafe_allow_html=True)
+    st.markdown("### 🛒 Tu Carrito de Compras")
     
     total = 0
     for i, product in enumerate(st.session_state.cart_products):
-        col1, col2, col3, col4 = st.columns([3, 1, 1, 1])
+        subtotal = product.price * product.quantity
+        total += subtotal
+        
+        col1, col2, col3, col4 = st.columns([4, 1, 1, 1])
         
         with col1:
-            st.write(f"{product.product_name} x{product.quantity}")
+            cart_item_html = f"""
+            <div class="cart-item">
+                <strong>{product.product_name}</strong> x{product.quantity}
+            </div>
+            """
+            st.markdown(cart_item_html, unsafe_allow_html=True)
         
         with col2:
-            st.write(f"{product.price:.2f}€")
+            st.markdown(f"<div class='cart-item'>{product.price:.2f}€</div>", unsafe_allow_html=True)
         
         with col3:
-            subtotal = product.price * product.quantity
-            st.write(f"{subtotal:.2f}€")
-            total += subtotal
+            st.markdown(f"<div class='cart-item'>{subtotal:.2f}€</div>", unsafe_allow_html=True)
         
         with col4:
-            if st.button("🗑️", key=f"remove_{i}"):
+            if st.button("🗑️", key=f"remove_{i}", help="Eliminar del carrito"):
                 st.session_state.cart_products.pop(i)
                 st.rerun()
+
+    # Total destacado
+    total_html = f"""
+    <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px; text-align: center; margin: 1rem 0;">
+        <h3 style="margin: 0; color: white;">💰 Total: {total:.2f}€</h3>
+    </div>
+    """
+    st.markdown(total_html, unsafe_allow_html=True)
     
-    st.write(f"**Total: {total:.2f}€**")
-    
-    # Botones de descarga
+    # Botones de descarga mejorados
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        if st.button("Descargar TXT"):
+        if st.button("📄 Descargar TXT", use_container_width=True):
             ticket = type('Ticket', (), {'products': st.session_state.cart_products, 'total_price': total})()
             txt_file = generate_txt(ticket).encode("utf-8")
-            st.download_button("Descargar TXT", txt_file, "lista_compra.txt")
+            st.download_button("📄 Descargar TXT", txt_file, "lista_compra.txt", use_container_width=True)
     
     with col2:
-        if st.button("Descargar JSON"):
+        if st.button("📋 Descargar JSON", use_container_width=True):
             ticket = {"products": [p.dict() for p in st.session_state.cart_products], "total_price": total}
             json_file = json.dumps(ticket, indent=2, ensure_ascii=False).encode("utf-8")
-            st.download_button("Descargar JSON", json_file, "lista_compra.json")
+            st.download_button("📋 Descargar JSON", json_file, "lista_compra.json", use_container_width=True)
     
     with col3:
-        if st.button("🧹 Limpiar Carrito"):
+        if st.button("🧹 Limpiar Carrito", use_container_width=True):
             st.session_state.cart_products = []
             st.rerun()
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
 else:
     st.info("Introduce tu lista de la compra para comenzar. Ejemplo: '2 de agua, 3 kg de arroz, un pan'")
 
-    
