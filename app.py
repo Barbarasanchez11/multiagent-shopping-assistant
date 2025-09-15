@@ -328,19 +328,100 @@ if user_input and user_input.strip():
                     
                     # Usar índice global para el key único
                     global_idx = start_idx + i
-                    if st.button(f"➕ Elegir", key=f"select_{product_group.original_query}_{global_idx}", 
-                               use_container_width=True):
-                        # Crear producto seleccionado
-                        selected_product = FoundProduct(
-                            product_name=option.product_name,
-                            price=float(option.price),
-                            quantity=option.quantity
-                        )
+                    product_id = f"{product_group.original_query}_{global_idx}"
+                    
+                    # Verificar si el producto ya está en el carrito para mostrar la cantidad
+                    current_quantity = 0
+                    for cart_product in st.session_state.cart_products:
+                        if cart_product.product_id == product_id:
+                            current_quantity = cart_product.quantity
+                            break
+                    
+                    # Inicializar cantidad temporal si no existe
+                    temp_quantity_key = f"temp_quantity_{product_id}"
+                    if temp_quantity_key not in st.session_state:
+                        st.session_state[temp_quantity_key] = 0
+                    
+                    temp_quantity = st.session_state[temp_quantity_key]
+                    
+                    # Crear layout: Botón Añadir + Selector de cantidad compacto
+                    col1, col2 = st.columns([2, 3])
+                    
+                    with col1:
+                        # Botón Añadir solo activo si hay cantidad > 0
+                        if st.button("Añadir", key=f"add_{product_id}", help="Añadir al carrito", disabled=(temp_quantity == 0)):
+                            # Verificar si el producto ya existe en el carrito
+                            existing_product = None
+                            for cart_product in st.session_state.cart_products:
+                                if cart_product.product_id == product_id:
+                                    existing_product = cart_product
+                                    break
+                            
+                            if existing_product:
+                                # Si existe, aumentar cantidad
+                                existing_product.quantity += temp_quantity
+                                st.success(f"✅ Cantidad actualizada: {existing_product.quantity}")
+                            else:
+                                # Si no existe, añadir nuevo producto
+                                selected_product = FoundProduct(
+                                    product_name=option.product_name,
+                                    price=float(option.price),
+                                    quantity=temp_quantity,
+                                    product_id=product_id
+                                )
+                                st.session_state.cart_products.append(selected_product)
+                                st.success(f"✅ {option.product_name} añadido al carrito!")
+                            
+                            # Resetear cantidad temporal
+                            st.session_state[temp_quantity_key] = 0
+                            st.rerun()
+                    
+                    with col2:
+                        # Mostrar cantidad temporal en el centro
+                        st.markdown(f"""
+                        <div style="
+                            background: linear-gradient(45deg, #667eea, #764ba2);
+                            color: white;
+                            padding: 0.6rem 1rem;
+                            border-radius: 10px;
+                            text-align: center;
+                            font-weight: bold;
+                            font-size: 1.2rem;
+                            margin: 0.5rem 0;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                            border: 2px solid rgba(255,255,255,0.2);
+                        ">
+                            {temp_quantity}
+                        </div>
+                        """, unsafe_allow_html=True)
                         
-                        # Añadir al carrito
-                        st.session_state.cart_products.append(selected_product)
-                        st.success(f"✅ {option.product_name} añadido al carrito!")
-                        st.rerun()
+                        # Botones en una fila horizontal usando st.columns en el nivel principal
+                        # Necesitamos salir del contexto de col2 para crear nuevas columnas
+                        pass
+                    
+                    # Crear botones fuera del contexto de col2 para evitar anidación
+                    btn_col1, btn_col2, btn_col3 = st.columns([2, 1, 1])
+                    
+                    with btn_col1:
+                        # Espacio vacío para alinear con el botón Añadir
+                        st.write("")
+                    
+                    with btn_col2:
+                        # Botón izquierdo: - o papelera según la cantidad temporal
+                        if temp_quantity > 1:
+                            if st.button("➖", key=f"decrease_{product_id}", help="Disminuir cantidad", use_container_width=True):
+                                st.session_state[temp_quantity_key] -= 1
+                                st.rerun()
+                        elif temp_quantity == 1:
+                            if st.button("🗑️", key=f"remove_{product_id}", help="Eliminar cantidad", use_container_width=True):
+                                st.session_state[temp_quantity_key] = 0
+                                st.rerun()
+                    
+                    with btn_col3:
+                        # Botón derecho: siempre + para aumentar cantidad temporal
+                        if st.button("➕", key=f"increase_{product_id}", help="Aumentar cantidad", use_container_width=True):
+                            st.session_state[temp_quantity_key] += 1
+                            st.rerun()
             
             # Mostrar información de paginación
             st.info(f"Mostrando {len(page_options)} de {len(filtered_options)} opciones filtradas (de {len(product_group.options)} total)")
@@ -359,23 +440,26 @@ if st.session_state.cart_products:
         subtotal = product.price * product.quantity
         total += subtotal
         
-        col1, col2, col3, col4 = st.columns([4, 1, 1, 1])
+        col1, col2, col3, col4, col5 = st.columns([3, 1, 1, 1, 1])
         
         with col1:
             cart_item_html = f"""
             <div class="cart-item">
-                <strong>{product.product_name}</strong> x{product.quantity}
+                <strong>{product.product_name}</strong>
             </div>
             """
             st.markdown(cart_item_html, unsafe_allow_html=True)
         
         with col2:
-            st.markdown(f"<div class='cart-item'>{product.price:.2f}€</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='cart-item'><strong>Cantidad: {product.quantity}</strong></div>", unsafe_allow_html=True)
         
         with col3:
-            st.markdown(f"<div class='cart-item'>{subtotal:.2f}€</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='cart-item'>{product.price:.2f}€</div>", unsafe_allow_html=True)
         
         with col4:
+            st.markdown(f"<div class='cart-item'><strong>{subtotal:.2f}€</strong></div>", unsafe_allow_html=True)
+        
+        with col5:
             if st.button("🗑️", key=f"remove_{i}", help="Eliminar del carrito"):
                 st.session_state.cart_products.pop(i)
                 st.rerun()
