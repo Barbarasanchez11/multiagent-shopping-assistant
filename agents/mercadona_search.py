@@ -47,7 +47,7 @@ def search_products_by_name(products: list):
         response = httpx.get(base_url, timeout=10.0)
         response.raise_for_status()
         data = response.json()
-                except Exception as e:
+    except Exception as e:
         print(f"❌ Error obteniendo categorías: {e}")
         return []
 
@@ -105,7 +105,7 @@ def search_products_by_name(products: list):
             best_option = min(product_options, key=lambda x: x['price'])
             found_products.append(best_option)
             print(f"✅ {product_name}: {len(product_options)} opciones encontradas, seleccionada: {best_option['product_name']} - {best_option['price']}€")
-                    else:
+        else:
             print(f"⚠️ No se encontraron productos para: {product_name}")
 
     return found_products
@@ -161,7 +161,7 @@ def search_products_with_options(products: list, max_options: int = None):
                                         'category': subcategory['name']
                                     })
                             except (KeyError, TypeError) as e:
-                    continue
+                                continue
                 
         # Ordenar por precio (más baratos primero)
         product_options.sort(key=lambda x: x['price'])
@@ -177,7 +177,7 @@ def search_products_with_options(products: list, max_options: int = None):
                 'options': product_options
             })
             print(f"✅ {product_name}: {len(product_options)} opciones encontradas")
-            else:
+        else:
             print(f"⚠️ No se encontraron productos para: {product_name}")
 
     return all_product_options
