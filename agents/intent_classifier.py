@@ -7,7 +7,7 @@ import json
 
 load_dotenv()
 
-llm = ChatGroq(model_name="llama3-8b-8192",  api_key=os.getenv("GROQ_API_KEY"))
+llm = ChatGroq(model_name="llama-3.1-8b-instant",  api_key=os.getenv("GROQ_API_KEY"))
 
 prompt = ChatPromptTemplate.from_template("""
 Eres un asistente de compras.
