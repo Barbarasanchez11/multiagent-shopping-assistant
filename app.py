@@ -6,53 +6,15 @@ import json
 import functools
 import time
 
-def get_product_emoji(product_name):
-    """Obtiene un emoji apropiado según el tipo de producto"""
-    name_lower = product_name.lower()
-    
-    # Categorías de productos con sus emojis
-    categories = {
-        'frutas': ['manzana', 'pera', 'plátano', 'naranja', 'limón', 'fresa', 'uva', 'melón', 'sandía', 'kiwi', 'piña', 'mango', 'cereza', 'ciruela', 'melocotón', 'albaricoque'],
-        'verduras': ['tomate', 'lechuga', 'cebolla', 'ajo', 'pimiento', 'pepino', 'zanahoria', 'patata', 'calabacín', 'berenjena', 'brócoli', 'coliflor', 'espinaca', 'acelga', 'apio', 'rábano'],
-        'carnes': ['pollo', 'ternera', 'cerdo', 'cordero', 'pavo', 'jamón', 'chorizo', 'salchicha', 'bacon', 'lomo', 'chuleta', 'filete', 'hamburguesa', 'salchichón'],
-        'pescados': ['salmón', 'atún', 'merluza', 'lenguado', 'dorada', 'lubina', 'bacalao', 'sardina', 'anchoa', 'boquerón', 'gambas', 'langostino', 'mejillón', 'almeja'],
-        'lácteos': ['leche', 'yogur', 'queso', 'mantequilla', 'nata', 'crema', 'requesón', 'cuajada', 'helado'],
-        'panadería': ['pan', 'bollo', 'croissant', 'magdalena', 'donut', 'tarta', 'pastel', 'galleta', 'bizcocho', 'tostada'],
-        'bebidas': ['agua', 'refresco', 'cerveza', 'vino', 'zumo', 'café', 'té', 'infusión', 'batido', 'smoothie'],
-        'cereales': ['arroz', 'pasta', 'cereal', 'avena', 'trigo', 'cebada', 'quinoa', 'bulgur', 'couscous'],
-        'conservas': ['lata', 'conserva', 'enlatado', 'bote', 'tarro'],
-        'congelados': ['congelado', 'helado', 'pizza', 'lasaña', 'patata'],
-        'dulces': ['chocolate', 'caramelo', 'gominola', 'bombón', 'turrón', 'mazapán'],
-        'snacks': ['patata', 'cacahuete', 'almendra', 'nuez', 'pipas', 'palomitas', 'crackers'],
-        'condimentos': ['aceite', 'vinagre', 'sal', 'azúcar', 'miel', 'mostaza', 'ketchup', 'mayonesa', 'salsa'],
-        'higiene': ['jabón', 'champú', 'gel', 'pasta', 'cepillo', 'papel', 'toallita', 'desodorante'],
-        'limpieza': ['detergente', 'suavizante', 'lejía', 'limpia', 'esponja', 'bayeta', 'fregona']
-    }
-    
-    # Buscar coincidencias
-    for category, keywords in categories.items():
-        for keyword in keywords:
-            if keyword in name_lower:
-                emoji_map = {
-                    'frutas': '🍎', 'verduras': '🥕', 'carnes': '🥩', 'pescados': '🐟',
-                    'lácteos': '🥛', 'panadería': '🍞', 'bebidas': '🥤', 'cereales': '🌾',
-                    'conservas': '🥫', 'congelados': '🧊', 'dulces': '🍫', 'snacks': '🍿',
-                    'condimentos': '🧂', 'higiene': '🧴', 'limpieza': '🧽'
-                }
-                return emoji_map.get(category, '🛒')
-    
-    # Emoji por defecto
-    return '🛒'
 
-# Configurar página
 st.set_page_config(
     page_title="Asistente de Compras",
     page_icon="🛒",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
-# CSS personalizado para mejorar la UI
+
 st.markdown("""
 <style>
     /* Importar fuentes de Google */
@@ -255,20 +217,7 @@ st.markdown("""
         opacity: 0.6;
     }
     
-    /* Botones específicos con estética moderna */
-    .stButton > button[data-testid*="add_"] {
-        background: linear-gradient(135deg, var(--success-color), #7CB342);
-        min-width: 120px;
-        height: 44px;
-        font-size: 0.9rem;
-        border-radius: 12px;
-    }
-    
-    .stButton > button[data-testid*="add_"]:hover {
-        background: linear-gradient(135deg, #7CB342, #689F38);
-        animation: pulse 0.6s ease-in-out;
-        transform: translateY(-2px);
-    }
+    /* Botones "Añadir" - estilos movidos a sección de correcciones críticas */
     
     .stButton > button[data-testid*="remove_"] {
         background: linear-gradient(135deg, var(--danger-color), #E57373);
@@ -581,23 +530,7 @@ st.markdown("""
         box-shadow: var(--shadow-md);
     }
     
-    /* Sidebar con estética moderna */
-    .css-1d391kg {
-        background: linear-gradient(180deg, var(--light-bg) 0%, var(--warm-bg) 100%);
-        border-right: 1px solid var(--border-color);
-    }
-    
-    .sidebar .stMarkdown h3 {
-        color: var(--primary-color);
-        font-weight: 700;
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
-    }
-    
-    .sidebar .stMarkdown p {
-        color: var(--gray-text);
-        line-height: 1.6;
-    }
+    /* Sidebar eliminado - CSS removido */
     
     /* Spinner personalizado */
     .stSpinner > div {
@@ -649,37 +582,48 @@ st.markdown("""
         opacity: 0.6;
     }
     
-    /* Estilos específicos para botones de cantidad de Streamlit */
-    .stButton > button[data-testid*="decrease_"],
-    .stButton > button[data-testid*="increase_"] {
-        background: var(--dark-text);
-        color: var(--olive-bg);
-        border: none;
-        border-radius: 6px;
-        font-weight: bold;
-        font-size: 1.2rem;
-        min-width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
+    /* Botones de cantidad - estilos movidos a sección de correcciones críticas */
+    
+    /* Botones de paginación con color verde oliva */
+    .stButton > button[data-testid*="first_"],
+    .stButton > button[data-testid*="prev_"],
+    .stButton > button[data-testid*="next_"],
+    .stButton > button[data-testid*="last_"] {
+        background: var(--olive-bg) !important;
+        color: var(--dark-text) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 8px !important;
+        padding: 0.6rem 1.2rem !important;
+        font-weight: 600 !important;
+        font-size: 0.85rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.02em !important;
+        height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.3s ease !important;
+        box-shadow: var(--shadow-sm) !important;
     }
     
-    .stButton > button[data-testid*="decrease_"]:hover:not(:disabled),
-    .stButton > button[data-testid*="increase_"]:hover:not(:disabled) {
-        background: var(--primary-color);
-        color: white;
-        transform: translateY(-1px);
+    .stButton > button[data-testid*="first_"]:hover:not(:disabled),
+    .stButton > button[data-testid*="prev_"]:hover:not(:disabled),
+    .stButton > button[data-testid*="next_"]:hover:not(:disabled),
+    .stButton > button[data-testid*="last_"]:hover:not(:disabled) {
+        background: var(--primary-color) !important;
+        color: white !important;
+        transform: translateY(-1px) !important;
+        box-shadow: var(--shadow-md) !important;
     }
     
-    .stButton > button[data-testid*="decrease_"]:disabled,
-    .stButton > button[data-testid*="increase_"]:disabled {
-        background: #666666;
-        color: #999999;
-        cursor: not-allowed;
-        opacity: 0.6;
+    .stButton > button[data-testid*="first_"]:disabled,
+    .stButton > button[data-testid*="prev_"]:disabled,
+    .stButton > button[data-testid*="next_"]:disabled,
+    .stButton > button[data-testid*="last_"]:disabled {
+        background: #666666 !important;
+        color: #999999 !important;
+        cursor: not-allowed !important;
+        opacity: 0.6 !important;
     }
     
     /* Responsive design */
@@ -700,23 +644,158 @@ st.markdown("""
             padding: 1.5rem;
         }
     }
+    
+    /* ===== CORRECCIONES CRÍTICAS DE VISIBILIDAD ===== */
+    
+    /* 1. Botones de cards visibles - Verde oliva con texto blanco */
+    .stButton > button[data-testid*="decrease_"],
+    .stButton > button[data-testid*="increase_"],
+    .stButton > button[key*="decrease_"],
+    .stButton > button[key*="increase_"] {
+        background: var(--olive-bg) !important;
+        color: white !important;
+        border: 1px solid var(--border-color) !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        font-weight: bold !important;
+        border-radius: 6px !important;
+        font-size: 1.2rem !important;
+        min-width: 32px !important;
+        height: 32px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stButton > button[data-testid*="decrease_"]:hover:not(:disabled),
+    .stButton > button[data-testid*="increase_"]:hover:not(:disabled),
+    .stButton > button[key*="decrease_"]:hover:not(:disabled),
+    .stButton > button[key*="increase_"]:hover:not(:disabled) {
+        background: var(--primary-color) !important;
+        color: white !important;
+        transform: translateY(-1px) !important;
+    }
+    
+    .stButton > button[data-testid*="decrease_"]:disabled,
+    .stButton > button[data-testid*="increase_"]:disabled,
+    .stButton > button[key*="decrease_"]:disabled,
+    .stButton > button[key*="increase_"]:disabled {
+        background: #666666 !important;
+        color: #999999 !important;
+        cursor: not-allowed !important;
+        opacity: 0.6 !important;
+    }
+    
+    .stButton > button[data-testid*="add_"],
+    .stButton > button[key*="add_"] {
+        background: var(--olive-bg) !important;
+        color: white !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        font-weight: 600 !important;
+        min-width: 120px !important;
+        height: 44px !important;
+        font-size: 0.9rem !important;
+        border-radius: 12px !important;
+        border: none !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .stButton > button[data-testid*="add_"]:hover:not(:disabled),
+    .stButton > button[key*="add_"]:hover:not(:disabled) {
+        background: #059669 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3) !important;
+    }
+    
+    .stButton > button[data-testid*="add_"]:disabled,
+    .stButton > button[key*="add_"]:disabled {
+        background: #666666 !important;
+        color: #999999 !important;
+        cursor: not-allowed !important;
+        opacity: 0.6 !important;
+    }
+    
+    /* 2. Selectboxes visibles */
+    .stSelectbox > div > div > div[data-baseweb="select"] {
+        background: white !important;
+        border: 2px solid var(--border-color) !important;
+        border-radius: 8px !important;
+    }
+    
+    .stSelectbox [data-baseweb="select"] > div {
+        color: var(--dark-text) !important;
+        font-weight: 500 !important;
+    }
+    
+    .stSelectbox [data-baseweb="select"] [data-baseweb="base-input"] {
+        color: var(--dark-text) !important;
+        font-weight: 500 !important;
+    }
+    
+    /* Dropdown menu options */
+    .stSelectbox [role="listbox"] [role="option"] {
+        background: white !important;
+        color: var(--dark-text) !important;
+    }
+    
+    .stSelectbox [role="listbox"] [role="option"]:hover {
+        background: var(--light-bg) !important;
+    }
+    
+    /* 3. Paginación consistente */
+    div[data-testid="column"] .stButton > button {
+        background: var(--olive-bg) !important;
+        color: var(--dark-text) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        padding: 0.6rem 1.2rem !important;
+        font-size: 0.85rem !important;
+        letter-spacing: 0.02em !important;
+        height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.3s ease !important;
+        box-shadow: var(--shadow-sm) !important;
+    }
+    
+    div[data-testid="column"] .stButton > button:hover:not(:disabled) {
+        background: var(--primary-color) !important;
+        color: white !important;
+        transform: translateY(-1px) !important;
+        box-shadow: var(--shadow-md) !important;
+    }
+    
+    div[data-testid="column"] .stButton > button:disabled {
+        background: #666666 !important;
+        color: #999999 !important;
+        cursor: not-allowed !important;
+        opacity: 0.6 !important;
+    }
+    
+    /* 4. Ocultar tooltip */
+    .hero-tip {
+        display: none !important;
+    }
+    
+    div[class*="hero-tip"] {
+        display: none !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-# Hero Section con estética de flavo
 st.markdown("""
 <div class="hero-section">
     <div class="hero-content">
         <h1 class="main-title">DESCUBRE NUEVOS SABORES</h1>
         <p class="subtitle">Asistente de compras inteligente para productos de supermercado con precios actualizados</p>
-        <div class="hero-tip">
-            <div style="display: flex; align-items: center; margin-left: 4rem;">
-                <span style="font-size: 1.4rem; margin-right: 0.8rem;">✨</span>
-                <span style="font-size: 1rem; font-weight: 500; color: var(--dark-text);">
-                    Escribe tu lista como: "2 de agua, 3 kg de arroz, un pan"
-                </span>
-            </div>
-        </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -733,49 +812,8 @@ if 'search_cache' not in st.session_state:
 if 'categories_cache' not in st.session_state:
     st.session_state.categories_cache = None
 
-# El caché funciona internamente sin mostrar botones al usuario
 
-# Sidebar con información útil
-with st.sidebar:
-    st.markdown("### 🛍️ Tu Carrito")
-    if st.session_state.cart_products:
-        st.write(f"**{len(st.session_state.cart_products)} productos**")
-        total = sum(p.price * p.quantity for p in st.session_state.cart_products)
-        st.write(f"**Total: {total:.2f}€**")
-    else:
-        st.write("Carrito vacío")
-    
-    st.divider()
-    
-    st.markdown("### 💡 Consejos")
-    st.markdown("""
-    - Escribe productos en español
-    - Incluye cantidades: "2 de agua"
-    - Usa unidades: "1 kg de arroz"
-    - Ejemplo: "3 manzanas, 2 leche, 1 pan"
-    """)
-    
-    st.divider()
-    
-    st.markdown("### 🔍 Filtros Rápidos")
-    st.markdown("""
-    - **Precio**: Ordena por menor/mayor
-    - **Nombre**: Busca productos específicos
-    - **Paginación**: Navega entre opciones
-    """)
-    
-    st.divider()
-    
-    st.markdown("### 📱 Funciones")
-    st.markdown("""
-    - ✅ Añadir al carrito
-    - 📄 Descargar lista
-    - 🧹 Limpiar carrito
-    - 💾 Guardar búsquedas
-    """)
-
-# Input de búsqueda mejorado
-st.markdown("### 🔍 ¿Qué necesitas comprar?")
+st.markdown("###  ¿Qué necesitas comprar?")
 user_input = st.text_input(
     "Escribe tu lista de la compra aquí...",
     placeholder="Ejemplo: 2 de agua, 3 kg de arroz, un pan, leche desnatada...",
@@ -798,13 +836,9 @@ if user_input and user_input.strip():
             st.session_state.search_cache[cache_key] = final_state
     
     if "product_options" in final_state and final_state["product_options"]:
-        st.subheader("Opciones Encontradas")
-        
         selected_products = []
         
         for product_group in final_state["product_options"]:
-            st.write(f"**{product_group.original_query.upper()}** (cantidad: {product_group.quantity}) - {len(product_group.options)} opciones encontradas")
-            
             # Inicializar paginación en session state
             pagination_key = f"page_{product_group.original_query}"
             if pagination_key not in st.session_state:
@@ -812,40 +846,28 @@ if user_input and user_input.strip():
             
             # Añadir filtros y ordenación con diseño mejorado
             st.markdown('<div class="filter-section">', unsafe_allow_html=True)
-            st.markdown("### 🔍 Filtros y Ordenación")
             
-            col1, col2, col3 = st.columns(3)
+            col1, col2 = st.columns(2)
             
             with col1:
                 sort_by = st.selectbox(
-                    "📊 Ordenar por:",
+                    "Ordenar por:",
                     ["Precio (menor a mayor)", "Precio (mayor a menor)", "Nombre A-Z", "Nombre Z-A"],
                     key=f"sort_{product_group.original_query}"
                 )
             
             with col2:
                 items_per_page = st.selectbox(
-                    "📄 Productos por página:",
+                    "Productos por página:",
                     [12, 24, 36, 48, 60],
                     index=1,  # Por defecto 24
                     key=f"per_page_{product_group.original_query}"
-                )
-            
-            with col3:
-                search_term = st.text_input(
-                    "🔎 Filtrar por nombre:",
-                    key=f"filter_{product_group.original_query}",
-                    placeholder="Ej: integral, sin gluten..."
                 )
             
             st.markdown('</div>', unsafe_allow_html=True)
             
             # Aplicar filtros y ordenación
             filtered_options = product_group.options
-            
-            # Filtrar por término de búsqueda
-            if search_term:
-                filtered_options = [opt for opt in filtered_options if search_term.lower() in opt.product_name.lower()]
             
             # Ordenar
             if sort_by == "Precio (menor a mayor)":
@@ -857,11 +879,11 @@ if user_input and user_input.strip():
             elif sort_by == "Nombre Z-A":
                 filtered_options.sort(key=lambda x: x.product_name, reverse=True)
             
-            # Calcular paginación
+         
             total_pages = (len(filtered_options) + items_per_page - 1) // items_per_page
             current_page = st.session_state[pagination_key]
             
-            # Asegurar que la página actual sea válida
+           
             if current_page > total_pages:
                 st.session_state[pagination_key] = 1
                 current_page = 1
@@ -869,14 +891,14 @@ if user_input and user_input.strip():
                 st.session_state[pagination_key] = 1
                 current_page = 1
             
-            # Calcular índices de inicio y fin
+       
             start_idx = (current_page - 1) * items_per_page
             end_idx = start_idx + items_per_page
             page_options = filtered_options[start_idx:end_idx]
             
-            # Mostrar controles de paginación mejorados
+          
             if total_pages > 1:
-                st.markdown("### 📄 Navegación")
+               
                 
                 col1, col2, col3, col4, col5 = st.columns([1, 1, 2, 1, 1])
                 
@@ -910,51 +932,47 @@ if user_input and user_input.strip():
                         st.session_state[pagination_key] = total_pages
                         st.rerun()
             
-            # Mostrar opciones en columnas (3 columnas) con diseño mejorado
+           
             cols = st.columns(3)
             
             for i, option in enumerate(page_options):
                 with cols[i % 3]:
-                    # Obtener emoji según el tipo de producto
-                    product_emoji = get_product_emoji(option.product_name)
-                    
-                    # Crear tarjeta de producto con estética de flavo
+                  
                     st.markdown(f"""
                     <div class="product-card">
                         <div class="product-name">{option.product_name.upper()}</div>
                         <div class="product-price">{option.price}€</div>
                     </div>
                     """, unsafe_allow_html=True)
-                    
-                    # Usar índice global para el key único
+                   
                     global_idx = start_idx + i
                     product_id = f"{product_group.original_query}_{global_idx}"
                     
-                    # Verificar si el producto ya está en el carrito para mostrar la cantidad
+                 
                     current_quantity = 0
                     for cart_product in st.session_state.cart_products:
                         if cart_product.product_id == product_id:
                             current_quantity = cart_product.quantity
                             break
                     
-                    # Inicializar cantidad temporal si no existe
+                  
                     temp_quantity_key = f"temp_quantity_{product_id}"
                     if temp_quantity_key not in st.session_state:
                         st.session_state[temp_quantity_key] = 0
                     
                     temp_quantity = st.session_state[temp_quantity_key]
                     
-                    # Selector de cantidad: - cantidad + (PRIMERO)
+                  
                     col_left, col_center, col_right = st.columns([1, 1, 1])
                     
                     with col_left:
-                        # Botón menos (deshabilitado si cantidad = 0)
+                       
                         if st.button("−", key=f"decrease_{product_id}", help="Disminuir cantidad", disabled=(temp_quantity == 0), use_container_width=True):
                             st.session_state[temp_quantity_key] -= 1
                             st.rerun()
                     
                     with col_center:
-                        # Mostrar cantidad en el centro (misma altura que los botones)
+                       
                         st.markdown(f"""
                         <div style="
                             background: var(--light-bg);
@@ -976,14 +994,14 @@ if user_input and user_input.strip():
                         """, unsafe_allow_html=True)
                     
                     with col_right:
-                        # Botón más
+                      
                         if st.button("+", key=f"increase_{product_id}", help="Aumentar cantidad", use_container_width=True):
                             st.session_state[temp_quantity_key] += 1
                             st.rerun()
                     
-                    # Botón Añadir (SEGUNDO)
+                   
                     if st.button("Añadir", key=f"add_{product_id}", help="Añadir al carrito", disabled=(temp_quantity == 0), use_container_width=True):
-                        # Verificar si el producto ya existe en el carrito
+                       
                         existing_product = None
                         for cart_product in st.session_state.cart_products:
                             if cart_product.product_id == product_id:
@@ -991,11 +1009,11 @@ if user_input and user_input.strip():
                                 break
                         
                         if existing_product:
-                            # Si existe, aumentar cantidad
+                           
                             existing_product.quantity += temp_quantity
-                            st.success(f"✅ Cantidad actualizada: {existing_product.quantity}")
+                            st.success(f"Cantidad actualizada: {existing_product.quantity}")
                         else:
-                            # Si no existe, añadir nuevo producto
+                            
                             selected_product = FoundProduct(
                                 product_name=option.product_name,
                                 price=float(option.price),
@@ -1003,20 +1021,20 @@ if user_input and user_input.strip():
                                 product_id=product_id
                             )
                             st.session_state.cart_products.append(selected_product)
-                            st.success(f"✅ {option.product_name} añadido al carrito!")
+                            st.success(f"{option.product_name} añadido al carrito!")
                         
-                        # Resetear cantidad temporal
+                      
                         st.session_state[temp_quantity_key] = 0
                         st.rerun()
             
-            # Mostrar información de paginación
+           
             st.info(f"Mostrando {len(page_options)} de {len(filtered_options)} opciones filtradas (de {len(product_group.options)} total)")
             
             st.divider()
     else:
         st.warning("No se pudieron encontrar productos para tu lista. Intenta con otros productos.")
 
-# Mostrar carrito con diseño moderno
+
 if st.session_state.cart_products:
     st.markdown('<div class="cart-section">', unsafe_allow_html=True)
     st.markdown('<div class="cart-content">', unsafe_allow_html=True)
@@ -1051,7 +1069,7 @@ if st.session_state.cart_products:
                 st.session_state.cart_products.pop(i)
                 st.rerun()
 
-    # Total destacado
+ 
     total_html = f"""
     <div style="background: rgba(255,255,255,0.2); padding: 1rem; border-radius: 8px; text-align: center; margin: 1rem 0;">
         <h3 style="margin: 0; color: white;">💰 Total: {total:.2f}€</h3>
@@ -1059,31 +1077,31 @@ if st.session_state.cart_products:
     """
     st.markdown(total_html, unsafe_allow_html=True)
     
-    # Botones de descarga mejorados
+   
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        if st.button("📄 Descargar TXT", use_container_width=True):
+        if st.button(" Descargar TXT", use_container_width=True):
             ticket = type('Ticket', (), {'products': st.session_state.cart_products, 'total_price': total})()
             txt_file = generate_txt(ticket).encode("utf-8")
-            st.download_button("📄 Descargar TXT", txt_file, "lista_compra.txt", use_container_width=True)
+            st.download_button(" Descargar TXT", txt_file, "lista_compra.txt", use_container_width=True)
     
     with col2:
-        if st.button("📋 Descargar JSON", use_container_width=True):
+        if st.button(" Descargar JSON", use_container_width=True):
             ticket = {"products": [p.dict() for p in st.session_state.cart_products], "total_price": total}
             json_file = json.dumps(ticket, indent=2, ensure_ascii=False).encode("utf-8")
-            st.download_button("📋 Descargar JSON", json_file, "lista_compra.json", use_container_width=True)
+            st.download_button(" Descargar JSON", json_file, "lista_compra.json", use_container_width=True)
     
     with col3:
         if st.button("🧹 Limpiar Carrito", use_container_width=True):
             st.session_state.cart_products = []
             st.rerun()
     
-    st.markdown('</div>', unsafe_allow_html=True)  # Cerrar cart-content
-    st.markdown('</div>', unsafe_allow_html=True)  # Cerrar cart-section
+    st.markdown('</div>', unsafe_allow_html=True)  
+    st.markdown('</div>', unsafe_allow_html=True) 
 
 else:
-    # Mensaje de bienvenida con estética moderna
+   
     st.markdown("""
     <div style="
         background: linear-gradient(135deg, var(--light-bg) 0%, var(--warm-bg) 100%);
@@ -1094,7 +1112,7 @@ else:
         box-shadow: var(--shadow-md);
         margin: 2rem 0;
     ">
-        <div style="font-size: 3rem; margin-bottom: 1rem;">🛍️</div>
+        <div style="font-size: 3rem; margin-bottom: 1rem;"></div>
         <h3 style="color: var(--primary-color); margin-bottom: 1rem; font-size: 1.5rem;">
             ¡Bienvenido a tu Asistente de Compras!
         </h3>

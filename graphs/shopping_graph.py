@@ -18,12 +18,12 @@ graph.add_edge("total_price", END)
 
 app = graph.compile()
 
-# Nuevo grafo con opciones múltiples
+
 graph_with_options = StateGraph(GraphState)
 
 graph_with_options.add_node("intent_classifier", classify_intent_agent)
 graph_with_options.add_node("mercadona_search", mercadona_search_with_options_agent)
-# No añadimos total_price aquí porque el usuario elegirá manualmente
+
 
 graph_with_options.set_entry_point("intent_classifier")
 graph_with_options.add_edge("intent_classifier", "mercadona_search")

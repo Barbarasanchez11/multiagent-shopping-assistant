@@ -9,7 +9,7 @@ class FoundProduct(BaseModel):
     product_name: str
     price: float
     quantity: int
-    product_id: Optional[str] = None  # ID único para identificar productos en el carrito
+    product_id: Optional[str] = None 
 
 class ProductOption(BaseModel):
     """Opción individual de producto encontrada en la API"""
@@ -32,7 +32,7 @@ class GraphState(BaseModel):
     user_input: str
     detected_products: Optional[List[DetectedProduct]] = None
     found_products: List[FoundProduct] = []
-    product_options: List[ProductOptions] = []  # Nuevo: opciones múltiples
-    selected_products: List[FoundProduct] = []  # Nuevo: productos seleccionados
+    product_options: List[ProductOptions] = [] 
+    selected_products: List[FoundProduct] = []  
     total_tickect: Optional[TotalPrice] = None
 

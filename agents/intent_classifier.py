@@ -6,8 +6,7 @@ import streamlit as st
 import json
 
 def get_llm():
-    """Obtiene el LLM con la API key correcta"""
-    # Obtener API key de variables de entorno
+
     api_key = st.secrets["secrets"]["GROQ_API_KEY"]
     
     if not api_key:
@@ -48,11 +47,10 @@ def parse_output(text: str):
         ]
         return products
     except json.JSONDecodeError as e:
-        print("Failed to parse JSON:", e)
         return []
 
 def classify_intent_agent(state: GraphState) -> GraphState:
-    # Obtener el LLM de forma lazy
+    
     llm = get_llm()
     chain = prompt | llm
     

@@ -3,12 +3,12 @@ from schemas import GraphState, DetectedProduct, ProductOptions, ProductOption
 import json
 import functools
 
-# Caché global para categorías
+
 _categories_cache = None
 
 @functools.lru_cache(maxsize=1)
 def get_categories():
-    """Obtiene las categorías de Mercadona con caché"""
+  
     global _categories_cache
     if _categories_cache is None:
         base_url = "https://tienda.mercadona.es/api/categories/"
@@ -17,7 +17,7 @@ def get_categories():
             response.raise_for_status()
             _categories_cache = response.json()
         except Exception as e:
-            print(f"❌ Error obteniendo categorías: {e}")
+           
             return None
     return _categories_cache
 
@@ -38,9 +38,7 @@ def mercadona_search_agent(state: GraphState) -> GraphState:
     return state
 
 def search_products_by_name(products: list):
-    """
-    Busca productos en la API de Mercadona y devuelve múltiples opciones por producto.
-    """
+   
     base_url = "https://tienda.mercadona.es/api/categories/"
     
     try:
@@ -48,7 +46,7 @@ def search_products_by_name(products: list):
         response.raise_for_status()
         data = response.json()
     except Exception as e:
-        print(f"❌ Error obteniendo categorías: {e}")
+     
         return []
 
     found_products = []
@@ -59,7 +57,7 @@ def search_products_by_name(products: list):
         product_options = []
         category_id = None
 
-        # Buscar categoría que contenga el producto
+       
         for category in data['results']:
             for subcategory in category['categories']:
                 if product_name in subcategory['name'].lower():
@@ -69,7 +67,7 @@ def search_products_by_name(products: list):
                 break
 
         if not category_id:
-            print(f"⚠️ No se encontró categoría para: {product_name}")
+          
             continue
 
         detail_url = f"{base_url}{category_id}"
@@ -79,10 +77,10 @@ def search_products_by_name(products: list):
             response_category.raise_for_status()
             data_category = response_category.json()
         except Exception as e:
-            print(f"❌ Error obteniendo categoría {category_id}: {e}")
+            
             continue
 
-        # Buscar TODAS las opciones que coincidan
+      
         for inner_cat in data_category['categories']:
             for product_category in inner_cat['products']:
                 if product_name.lower() in product_category['display_name'].lower():
@@ -99,23 +97,17 @@ def search_products_by_name(products: list):
                     except (KeyError, TypeError) as e:
                         continue
 
-        # Si encontramos opciones, añadir la mejor (más barata)
+        
         if product_options:
-            # Ordenar por precio y tomar la más barata
+            
             best_option = min(product_options, key=lambda x: x['price'])
             found_products.append(best_option)
-            print(f"✅ {product_name}: {len(product_options)} opciones encontradas, seleccionada: {best_option['product_name']} - {best_option['price']}€")
-        else:
-            print(f"⚠️ No se encontraron productos para: {product_name}")
+            
 
     return found_products
 
 def search_products_with_options(products: list, max_options: int = None):
-    """
-    Busca productos en la API de Mercadona y devuelve TODAS las opciones encontradas.
-    Busca en todas las categorías para encontrar todos los productos que contengan la palabra.
-    """
-    # Usar caché para categorías
+   
     data = get_categories()
     if not data:
         return []
@@ -128,9 +120,9 @@ def search_products_with_options(products: list, max_options: int = None):
         quantity = product['quantity']
         product_options = []
         
-        print(f"🔍 Buscando TODOS los productos que contengan '{product_name}'...")
+      
 
-        # Buscar en TODAS las categorías, no solo en una específica
+     
         for category in data['results']:
             for subcategory in category['categories']:
                 category_id = subcategory['id']
@@ -141,9 +133,9 @@ def search_products_with_options(products: list, max_options: int = None):
                     response_category.raise_for_status()
                     data_category = response_category.json()
                 except Exception as e:
-                    continue  # Si falla una categoría, continuar con la siguiente
+                    continue  
 
-                # Buscar TODAS las opciones que coincidan en esta categoría
+              
                 for inner_cat in data_category['categories']:
                     for product_category in inner_cat['products']:
                         if product_name.lower() in product_category['display_name'].lower():
@@ -151,7 +143,7 @@ def search_products_with_options(products: list, max_options: int = None):
                                 price = product_category['price_instructions']['unit_price']
                                 display_name = product_category['display_name']
                                 
-                                # Evitar duplicados
+                               
                                 if not any(opt['product_name'] == display_name for opt in product_options):
                                     product_options.append({
                                         'product_name': display_name,
@@ -163,10 +155,10 @@ def search_products_with_options(products: list, max_options: int = None):
                             except (KeyError, TypeError) as e:
                                 continue
                 
-        # Ordenar por precio (más baratos primero)
+       
         product_options.sort(key=lambda x: x['price'])
         
-        # Aplicar límite solo si se especifica
+     
         if max_options and len(product_options) > max_options:
             product_options = product_options[:max_options]
         
@@ -176,16 +168,12 @@ def search_products_with_options(products: list, max_options: int = None):
                 'quantity': quantity,
                 'options': product_options
             })
-            print(f"✅ {product_name}: {len(product_options)} opciones encontradas")
-        else:
-            print(f"⚠️ No se encontraron productos para: {product_name}")
+            
 
     return all_product_options
 
 def mercadona_search_with_options_agent(state: GraphState) -> GraphState:
-    """
-    Nuevo agente que busca productos y devuelve múltiples opciones para que el usuario elija.
-    """
+  
     if not state.detected_products:
         return state
     
@@ -195,10 +183,10 @@ def mercadona_search_with_options_agent(state: GraphState) -> GraphState:
         product_dict = item.dict()
         products.append(product_dict)
 
-    # Buscar TODAS las opciones (sin límite)
+
     product_options_data = search_products_with_options(products, max_options=None)
     
-    # Convertir a objetos ProductOptions
+    
     product_options = []
     for item in product_options_data:
         options = [ProductOption(**option) for option in item['options']]
