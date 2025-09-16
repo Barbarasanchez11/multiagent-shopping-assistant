@@ -1,13 +1,14 @@
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from schemas import DetectedProduct, GraphState
-import os
+import streamlit as st
+
 import json
 
 def get_llm():
     """Obtiene el LLM con la API key correcta"""
     # Obtener API key de variables de entorno
-    api_key = os.getenv("GROQ_API_KEY")
+    api_key = st.secrets["secrets"]["GROQ_API_KEY"]
     
     if not api_key:
         raise ValueError("GROQ_API_KEY no está configurada. Por favor, configura la variable de entorno.")
