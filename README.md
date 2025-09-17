@@ -39,10 +39,10 @@ poetry add langchain@0.3.25
 Crea un archivo `.env` en la raíz del proyecto con la siguiente variable:
 
 ```plaintext
-GROQ_API_KEY=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
+GROQ_API_KEY=Tu_clave_secreta
 ```
 
-> **Nota:** Este paso es exclusivamente para pruebas de un repositorio privado. Bajo ninguna otra circunstancia se debe compartir esta clave.
+
 
 ## Ejecución del Proyecto
 
