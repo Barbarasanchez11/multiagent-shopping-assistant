@@ -37,12 +37,13 @@ st.markdown("""
     
     .stApp {
         background-color: var(--vanilla-light);
+        color: var(--black);
     }
 
     /* Hero Section */
     .hero-section {
         background: var(--olive);
-        color: var(--black);
+        color: var(--white);
         padding: 3rem 2rem;
         border-radius: 16px;
         margin-bottom: 2rem;
@@ -50,21 +51,21 @@ st.markdown("""
         box-shadow: 0 10px 25px rgba(139, 160, 112, 0.2);
     }
     
-    .main-title {
+    .hero-section .main-title {
         font-size: 2.5rem;
         font-weight: 800;
         margin-bottom: 1rem;
         text-transform: uppercase;
         letter-spacing: -0.025em;
-        color: var(--black);
+        color: var(--white);
     }
     
-    .subtitle {
+    .hero-section .subtitle {
         font-size: 1.125rem;
-        opacity: 0.8;
+        opacity: 0.9;
         margin-bottom: 0;
         line-height: 1.6;
-        color: var(--black);
+        color: var(--white);
     }
 
     /* Cards de productos */
@@ -77,10 +78,18 @@ st.markdown("""
         text-align: center;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         transition: all 0.2s ease;
-        min-height: 200px;
+        min-height: 180px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+    }
+    
+    /* Grid responsive para productos */
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
     }
     
     .product-card:hover {
@@ -103,6 +112,32 @@ st.markdown("""
         color: var(--black);
         margin: 0.5rem 0;
     }
+    
+    /* Botones específicos en cards de productos */
+    .product-card .stButton > button {
+        background: var(--olive) !important;
+        color: var(--black) !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+        box-shadow: none !important;
+    }
+    
+    .product-card .stButton > button:hover:not(:disabled) {
+        background: var(--olive-dark) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 12px rgba(139, 160, 112, 0.3) !important;
+    }
+    
+    .product-card .stButton > button:disabled {
+        background: var(--vanilla) !important;
+        color: var(--black) !important;
+        border: 2px solid var(--olive) !important;
+        cursor: not-allowed !important;
+        opacity: 0.8 !important;
+        font-weight: 600 !important;
+    }
 
     /* Botones de cantidad */
     .stButton > button[data-testid*="decrease_"],
@@ -122,6 +157,39 @@ st.markdown("""
         justify-content: center !important;
         transition: all 0.2s ease !important;
         box-shadow: none !important;
+    }
+    
+    /* Asegurar que el contenido del botón sea visible */
+    .stButton > button[data-testid*="decrease_"] span,
+    .stButton > button[data-testid*="increase_"] span,
+    .stButton > button[key*="decrease_"] span,
+    .stButton > button[key*="increase_"] span,
+    .stButton > button[data-testid*="decrease_"] *,
+    .stButton > button[data-testid*="increase_"] *,
+    .stButton > button[key*="decrease_"] *,
+    .stButton > button[key*="increase_"] * {
+        color: var(--black) !important;
+        font-weight: 700 !important;
+        font-size: 1.2rem !important;
+    }
+    
+    /* Forzar visibilidad del texto en botones de cantidad */
+    .stButton > button[data-testid*="decrease_"],
+    .stButton > button[data-testid*="increase_"],
+    .stButton > button[key*="decrease_"],
+    .stButton > button[key*="increase_"] {
+        color: var(--black) !important;
+        text-shadow: none !important;
+        font-size: 1.5rem !important;
+        line-height: 1 !important;
+    }
+    
+    /* Asegurar que los emojis se muestren correctamente */
+    .stButton > button[data-testid*="decrease_"]:before,
+    .stButton > button[data-testid*="increase_"]:before,
+    .stButton > button[key*="decrease_"]:before,
+    .stButton > button[key*="increase_"]:before {
+        content: "" !important;
     }
     
     .stButton > button[data-testid*="decrease_"]:hover:not(:disabled),
@@ -169,8 +237,10 @@ st.markdown("""
     .stButton > button[key*="add_"]:disabled {
         background: var(--vanilla) !important;
         color: var(--black) !important;
+        border: 2px solid var(--olive) !important;
         cursor: not-allowed !important;
-        opacity: 0.6 !important;
+        opacity: 0.8 !important;
+        font-weight: 600 !important;
     }
 
     /* Botones de paginación */
@@ -219,7 +289,7 @@ st.markdown("""
         padding: 0.75rem 1rem;
         font-size: 1rem;
         background: var(--vanilla);
-        color: var(--black);
+        color: var(--black) !important;
         transition: all 0.2s ease;
     }
     
@@ -229,30 +299,50 @@ st.markdown("""
         box-shadow: 0 0 0 3px rgba(139, 160, 112, 0.1);
     }
     
+    .stTextInput input::placeholder {
+        color: var(--black) !important;
+        opacity: 0.7;
+    }
+    
     .stSelectbox > div > div {
         background: var(--vanilla);
         border: 2px solid var(--olive);
         border-radius: 8px;
-        color: var(--black);
+        color: var(--black) !important;
         transition: all 0.2s ease;
     }
     
     .stSelectbox > div > div:hover {
         border-color: var(--olive-dark);
     }
-
-    /* Carrito */
-    .cart-section {
-        background: var(--vanilla);
-        border: 1px solid var(--olive);
-        border-radius: 12px;
-        padding: 2rem;
-        margin-top: 2rem;
-        box-shadow: 0 4px 6px rgba(139, 160, 112, 0.1);
+    
+    /* Texto general y placeholders */
+    div, p, span, h1, h2, h3, h4, h5, h6, label, 
+    .stTextInput input::placeholder, 
+    .stTextArea textarea::placeholder,
+    .stSelectbox div,
+    .stAlert, .stInfo, .stWarning, .stSuccess, .stError,
+    .stMarkdown, .stWrite, .stText {
+        color: var(--black) !important;
+    }
+    
+    .stTextInput input::placeholder,
+    .stTextArea textarea::placeholder {
+        opacity: 0.7;
     }
 
+    /* Carrito */
+   
+
     /* Estilos generales para TODOS los botones de Streamlit */
-    .stButton > button {
+    .stButton > button,
+    .stDownloadButton > button,
+    .stButton > div > button,
+    .stDownloadButton > div > button,
+    .stButton > button[type="button"],
+    .stButton > button[role="button"],
+    .stDownloadButton > button[type="button"],
+    .stDownloadButton > button[role="button"] {
         background: var(--olive) !important;
         color: var(--black) !important;
         border: none !important;
@@ -262,27 +352,26 @@ st.markdown("""
         box-shadow: none !important;
     }
     
-    .stButton > button:hover:not(:disabled) {
+    .stButton > button:hover:not(:disabled),
+    .stDownloadButton > button:hover:not(:disabled),
+    .stButton > div > button:hover:not(:disabled),
+    .stDownloadButton > div > button:hover:not(:disabled) {
         background: var(--olive-dark) !important;
         color: var(--black) !important;
         transform: translateY(-1px) !important;
         box-shadow: 0 4px 12px rgba(139, 160, 112, 0.3) !important;
     }
     
-    .stButton > button:disabled {
+    .stButton > button:disabled,
+    .stDownloadButton > button:disabled,
+    .stButton > div > button:disabled,
+    .stDownloadButton > div > button:disabled {
         background: var(--vanilla) !important;
         color: var(--black) !important;
+        border: 2px solid var(--olive) !important;
         cursor: not-allowed !important;
-        opacity: 0.6 !important;
-    }
-    
-    /* Forzar estilos para botones específicos que puedan estar heredando otros estilos */
-    .stButton > button[type="button"],
-    .stButton > button[role="button"] {
-        background: var(--olive) !important;
-        color: var(--black) !important;
-        border: none !important;
-        box-shadow: none !important;
+        opacity: 0.8 !important;
+        font-weight: 600 !important;
     }
     
     /* Botones de descarga específicos */
@@ -319,6 +408,34 @@ st.markdown("""
         color: var(--black) !important;
         border: none !important;
         box-shadow: none !important;
+    }
+    
+    /* Estilos para el div de información de página */
+    .stAlert {
+        height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 8px !important;
+        background: var(--vanilla) !important;
+        border: 2px solid var(--olive) !important;
+        color: var(--black) !important;
+        font-weight: 600 !important;
+        font-size: 0.875rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.025em !important;
+    }
+    
+    /* Asegurar que el contenido del alert esté centrado */
+    .stAlert > div {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     /* Responsive */
@@ -443,9 +560,95 @@ if user_input and user_input.strip():
             end_idx = start_idx + items_per_page
             page_options = filtered_options[start_idx:end_idx]
             
-            # Controles de paginación
+            # Mostrar productos en columnas
+            st.markdown("### Productos Encontrados")
+            cols = st.columns(3)
+            
+            for i, option in enumerate(page_options):
+                with cols[i % 3]:
+                    # Crear tarjeta de producto
+                    st.markdown(f"""
+                    <div class="product-card">
+                        <div class="product-name">{option.product_name.upper()}</div>
+                        <div class="product-price">{option.price}€</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    # ID único del producto
+                    global_idx = start_idx + i
+                    product_id = f"{product_group.original_query}_{global_idx}"
+                    
+                    # Manejar cantidad temporal
+                    temp_quantity_key = f"temp_quantity_{product_id}"
+                    if temp_quantity_key not in st.session_state:
+                        st.session_state[temp_quantity_key] = 0
+                    
+                    temp_quantity = st.session_state[temp_quantity_key]
+                    
+                    # Control de cantidad
+                    col_left, col_center, col_right = st.columns([1, 1, 1])
+                    
+                    with col_left:
+                        if st.button("➖", key=f"decrease_{product_id}", 
+                                   disabled=(temp_quantity == 0), use_container_width=True):
+                            st.session_state[temp_quantity_key] -= 1
+                            st.rerun()
+                    
+                    with col_center:
+                        st.markdown(f"""
+                        <div style="
+                            background: var(--vanilla);
+                            border: 2px solid var(--olive);
+                            border-radius: 8px;
+                            padding: 0.5rem;
+                            text-align: center;
+                            font-weight: 700;
+                            font-size: 1.2rem;
+                            color: var(--black);
+                            height: 40px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        ">
+                            {temp_quantity}
+                        </div>
+                        """, unsafe_allow_html=True)
+                    
+                    with col_right:
+                        if st.button("➕", key=f"increase_{product_id}", use_container_width=True):
+                            st.session_state[temp_quantity_key] += 1
+                            st.rerun()
+                    
+                    # Botón añadir al carrito
+                    if st.button("Añadir", key=f"add_{product_id}", 
+                               disabled=(temp_quantity == 0), use_container_width=True):
+                        
+                        # Buscar si el producto ya existe en el carrito
+                            existing_product = None
+                            for cart_product in st.session_state.cart_products:
+                                if cart_product.product_id == product_id:
+                                    existing_product = cart_product
+                                    break
+                            
+                            if existing_product:
+                                existing_product.quantity += temp_quantity
+                                st.success(f"✅ Cantidad actualizada: {existing_product.quantity}")
+                            else:
+                                selected_product = FoundProduct(
+                                    product_name=option.product_name,
+                                    price=float(option.price),
+                                    quantity=temp_quantity,
+                                    product_id=product_id
+                                )
+                                st.session_state.cart_products.append(selected_product)
+                                st.success(f" {option.product_name} añadido al carrito!")
+                            
+                        # Reiniciar cantidad temporal
+                            st.session_state[temp_quantity_key] = 0
+                            st.rerun()
+
+            # Controles de paginación (después de la lista de productos)
             if total_pages > 1:
-                st.markdown("### 📄 Navegación")
                 col1, col2, col3, col4, col5 = st.columns([1, 1, 2, 1, 1])
                 
                 with col1:
@@ -477,102 +680,14 @@ if user_input and user_input.strip():
                         st.session_state[pagination_key] = total_pages
                         st.rerun()
             
-            # Mostrar productos en columnas
-            st.markdown("### 🛍️ Productos Encontrados")
-            cols = st.columns(3)
-            
-            for i, option in enumerate(page_options):
-                with cols[i % 3]:
-                    # Crear tarjeta de producto
-                    st.markdown(f"""
-                    <div class="product-card">
-                        <div class="product-name">{option.product_name.upper()}</div>
-                        <div class="product-price">{option.price}€</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    
-                    # ID único del producto
-                    global_idx = start_idx + i
-                    product_id = f"{product_group.original_query}_{global_idx}"
-                    
-                    # Manejar cantidad temporal
-                    temp_quantity_key = f"temp_quantity_{product_id}"
-                    if temp_quantity_key not in st.session_state:
-                        st.session_state[temp_quantity_key] = 0
-                    
-                    temp_quantity = st.session_state[temp_quantity_key]
-                    
-                    # Control de cantidad
-                    col_left, col_center, col_right = st.columns([1, 1, 1])
-                    
-                    with col_left:
-                        if st.button("−", key=f"decrease_{product_id}", 
-                                   disabled=(temp_quantity == 0), use_container_width=True):
-                            st.session_state[temp_quantity_key] -= 1
-                            st.rerun()
-                    
-                    with col_center:
-                        st.markdown(f"""
-                        <div style="
-                            background: var(--vanilla);
-                            border: 2px solid var(--olive);
-                            border-radius: 8px;
-                            padding: 0.5rem;
-                            text-align: center;
-                            font-weight: 700;
-                            font-size: 1.2rem;
-                            color: var(--black);
-                            height: 40px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        ">
-                            {temp_quantity}
-                        </div>
-                        """, unsafe_allow_html=True)
-                    
-                    with col_right:
-                        if st.button("+", key=f"increase_{product_id}", use_container_width=True):
-                            st.session_state[temp_quantity_key] += 1
-                            st.rerun()
-                    
-                    # Botón añadir al carrito
-                    if st.button("Añadir", key=f"add_{product_id}", 
-                               disabled=(temp_quantity == 0), use_container_width=True):
-                        
-                        # Buscar si el producto ya existe en el carrito
-                            existing_product = None
-                            for cart_product in st.session_state.cart_products:
-                                if cart_product.product_id == product_id:
-                                    existing_product = cart_product
-                                    break
-                            
-                            if existing_product:
-                                existing_product.quantity += temp_quantity
-                                st.success(f"✅ Cantidad actualizada: {existing_product.quantity}")
-                            else:
-                                selected_product = FoundProduct(
-                                    product_name=option.product_name,
-                                    price=float(option.price),
-                                    quantity=temp_quantity,
-                                    product_id=product_id
-                                )
-                                st.session_state.cart_products.append(selected_product)
-                                st.success(f"✅ {option.product_name} añadido al carrito!")
-                            
-                        # Reiniciar cantidad temporal
-                            st.session_state[temp_quantity_key] = 0
-                            st.rerun()
-
-            st.info(f"📊 Mostrando {len(page_options)} de {len(filtered_options)} opciones")
             st.divider()
     else:
-        st.warning("⚠️ No se pudieron encontrar productos para tu lista. Intenta con otros productos.")
+        st.warning(" No se pudieron encontrar productos para tu lista. Intenta con otros productos.")
 
 # Carrito de compras
 if st.session_state.cart_products:
     st.markdown('<div class="cart-section">', unsafe_allow_html=True)
-    st.header("🛒 Tu Carrito de Compras")
+    st.header("Tu Carrito")
     
     total = 0
     for i, product in enumerate(st.session_state.cart_products):
@@ -598,7 +713,7 @@ if st.session_state.cart_products:
                 st.session_state.cart_products.pop(i)
                 st.rerun()
 
-    st.metric("💰 Total", f"{total:.2f}€")
+    st.metric(" Total", f"{total:.2f}€")
     
     # Botones de descarga y limpieza
     col1, col2, col3 = st.columns(3)
@@ -622,11 +737,11 @@ if st.session_state.cart_products:
             st.download_button("📋 Descargar JSON", json_file, "lista_compra.json", use_container_width=True)
     
     with col3:
-        if st.button("🧹 Limpiar Carrito", use_container_width=True):
+        if st.button("Limpiar Carrito", use_container_width=True):
             st.session_state.cart_products = []
             st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
 
 else:
-    st.info("👋 ¡Bienvenido a tu Asistente de Compras! Introduce tu lista de la compra para comenzar.")
+    pass
